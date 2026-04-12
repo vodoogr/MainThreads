@@ -17,7 +17,7 @@ export default function App() {
         <Route path="/" element={<Navigate to="/inicio_sistema_neural_vivo" replace />} />
         <Route path="/inicio_sistema_neural_vivo" element={<InicioSistemaNeuralVivo />} />
         <Route path="/nueva_entrada" element={<NuevaEntrada />} />
-        <Route path="/detalle_de_nodo" element={<DetalleDeNodo />} />
+        <Route path="/detalle_de_nodo/:nodeId" element={<DetalleDeNodo />} />
         <Route path="/historial" element={<Historial />} />
         <Route path="/perspectivas_insights" element={<PerspectivasInsights />} />
         <Route path="/etheric_slate" element={<EthericSlate />} />

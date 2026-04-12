@@ -119,7 +119,34 @@ export const recentThoughts = [
   },
 ];
 
-// Node Detail (using Circuit 3 as example)
+// Individual entries for each circuit to support the "Orbital" deep dive
+export const circuitEntries = {
+  [CIRCUIT_IDS.BIO_SURVIVAL]: [
+    { id: 'b1', text: 'Sensación de alerta por ruidos extraños', intensity: 7 },
+    { id: 'b2', text: 'Hambre intensa no satisfecha', intensity: 5 },
+    { id: 'b3', text: 'Seguridad al cerrar la puerta de casa', intensity: 3 },
+  ],
+  [CIRCUIT_IDS.EMOTIONAL]: [
+    { id: 'e1', text: 'Enfado por la crítica de un compañero', intensity: 8 },
+    { id: 'e2', text: 'Satisfacción por liderar la reunión', intensity: 6 },
+  ],
+  [CIRCUIT_IDS.SYMBOLIC]: [
+    { id: 's1', text: 'Resolución de bug complejo en el backend', intensity: 10 },
+    { id: 's2', text: 'Leyendo sobre teoría de grafos', intensity: 7 },
+    { id: 's3', text: 'Organización de tareas de la semana', intensity: 8 },
+    { id: 's4', text: 'Planificación de arquitectura react', intensity: 9 },
+    { id: 's5', text: 'Clasificación semántica de recuerdos', intensity: 6 },
+  ],
+  [CIRCUIT_IDS.SOCIO_SEXUAL]: [
+    { id: 'ss1', text: 'Incómodo en el evento social multitudinario', intensity: 4 },
+  ],
+  [CIRCUIT_IDS.METAPROGRAMMING]: [
+    { id: 'm1', text: 'Observando mis pensamientos de ansiedad', intensity: 6 },
+    { id: 'm2', text: 'Dándome cuenta de mis mecanismos de defensa', intensity: 8 },
+  ],
+};
+
+// Node Detail
 export const nodeDetail = {
   id: CIRCUIT_IDS.SYMBOLIC,
   title: CIRCUIT_LABELS[CIRCUIT_IDS.SYMBOLIC],
