@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import ScreenContainer from '../components/ScreenContainer';
 import SummaryCard from '../components/SummaryCard';
 import EntryCard from '../components/EntryCard';
-import BrainGraphPlaceholder from '../components/BrainGraphPlaceholder';
+import BrainGraph from '../components/BrainGraph';
 import { dailySummary, recentThoughts } from '../data/mockData';
 
 export default function InicioSistemaNeuralVivo() {
@@ -12,7 +12,7 @@ export default function InicioSistemaNeuralVivo() {
     <ScreenContainer>
       <div className="section-gap" style={{ paddingTop: '2rem' }}>
         {/* Brain Graph Area */}
-        <BrainGraphPlaceholder />
+        <BrainGraph />
 
         {/* Summary Cards Bento Grid */}
         <div

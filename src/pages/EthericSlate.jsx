@@ -1,5 +1,5 @@
 import ScreenContainer from '../components/ScreenContainer';
-import BrainGraphPlaceholder from '../components/BrainGraphPlaceholder';
+import BrainGraph from '../components/BrainGraph';
 
 export default function EthericSlate() {
   return (
@@ -18,7 +18,7 @@ export default function EthericSlate() {
         </section>
 
         {/* Graph sandbox */}
-        <BrainGraphPlaceholder />
+        <BrainGraph />
 
         {/* Experiment controls placeholder */}
         <div className="card" style={{ padding: '2rem' }}>
