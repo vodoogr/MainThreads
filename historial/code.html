@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#490006",
+                    "surface-variant": "#262626",
+                    "surface-container": "#191a1a",
+                    "surface-bright": "#2c2c2c",
+                    "surface": "#0e0e0e",
+                    "inverse-surface": "#fcf9f8",
+                    "tertiary-fixed": "#f9db7d",
+                    "tertiary-container": "#f9db7d",
+                    "inverse-on-surface": "#565555",
+                    "background": "#0e0e0e",
+                    "secondary-fixed": "#ebdcff",
+                    "on-primary-fixed": "#004844",
+                    "on-secondary": "#49366c",
+                    "secondary-fixed-dim": "#dfccff",
+                    "secondary": "#d3bcfc",
+                    "on-primary-container": "#adf9f2",
+                    "on-surface": "#e7e5e4",
+                    "on-tertiary-fixed-variant": "#6b5600",
+                    "on-tertiary-fixed": "#493a00",
+                    "surface-container-highest": "#262626",
+                    "surface-container-low": "#131313",
+                    "outline": "#767575",
+                    "tertiary-fixed-dim": "#eacd71",
+                    "error": "#fa746f",
+                    "surface-container-lowest": "#000000",
+                    "on-surface-variant": "#acabaa",
+                    "surface-dim": "#0e0e0e",
+                    "surface-tint": "#89d4cd",
+                    "on-background": "#e7e5e4",
+                    "inverse-primary": "#146a65",
+                    "on-secondary-fixed": "#48356b",
+                    "tertiary": "#ffeaaf",
+                    "on-tertiary-container": "#5f4c00",
+                    "on-primary": "#004944",
+                    "error-container": "#871f21",
+                    "primary-dim": "#7bc6bf",
+                    "tertiary-dim": "#eacd71",
+                    "primary": "#89d4cd",
+                    "primary-fixed": "#a4f0e9",
+                    "surface-container-high": "#1f2020",
+                    "on-secondary-fixed-variant": "#65518a",
+                    "on-tertiary": "#695400",
+                    "outline-variant": "#484848",
+                    "error-dim": "#c54d4a",
+                    "secondary-dim": "#c5aeed",
+                    "primary-container": "#01625d",
+                    "on-error-container": "#ff9993",
+                    "on-secondary-container": "#cbb5f4",
+                    "secondary-container": "#443167",
+                    "on-primary-fixed-variant": "#0d6661",
+                    "primary-fixed-dim": "#97e2db"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0e0e0e;
+            color: #e7e5e4;
+            font-family: 'Manrope', sans-serif;
+        }
+        .celestial-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen pb-32">
+<!-- Top Navigation Anchor -->
+<header class="bg-[#0e0e0e] flex justify-between items-center px-6 py-4 w-full sticky top-0 z-[60]">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden">
+<img alt="Perfil del usuario" class="w-full h-full object-cover" data-alt="Portrait of a contemplative man with soft studio lighting and a dark minimalist background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpifVY9hZPAK1_gJm5IVsCj0YHgcMO9N42-L_GPjJbWVCd0EIumwJXrUFJViGqtqJMJNXilfzVDMwfKuIe3ooi-Yin2FhX94SWVwh9oFb1ZeMy3vbckf6HVKhyMrjspMysxY-r1KFm-JtVuqoYl8tCMNKURLu6VCk1vDaXvVYzMRzIw_dZsiUz-5eN08QG4-OZmPXfo0mMoHUK8w6saCXjEdw34TNEAx88wMIla0UCg7-DE-pSBYNd_m0Lr5z3Z950SHY7nyjEnLs"/>
+</div>
+<span class="font-manrope text-sm tracking-widest uppercase text-[#89d4cd]">Archivo</span>
+</div>
+<div class="text-lg font-bold text-[#e7e5e4] tracking-tight">Mental Threads</div>
+<div class="text-[#484848] transition-colors duration-300 hover:bg-[#1f2020] p-2 rounded-full cursor-pointer">
+<span class="material-symbols-outlined">calendar_today</span>
+</div>
+</header>
+<main class="max-w-4xl mx-auto px-6 pt-8 space-y-12">
+<!-- Hero: Month Picker & Summary -->
+<section class="space-y-6">
+<div class="flex items-baseline justify-between">
+<h1 class="text-3xl font-light tracking-tight text-on-surface">Octubre <span class="text-primary/60 font-extralight">2023</span></h1>
+<div class="flex gap-2">
+<button class="p-2 rounded-full bg-surface-container-high hover:bg-surface-variant text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-2 rounded-full bg-surface-container-high hover:bg-surface-variant text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Calendar View -->
+<div class="grid grid-cols-7 gap-2">
+<div class="text-center text-[10px] font-bold tracking-widest text-outline-variant uppercase mb-2">Lun</div>
+<div class="text-center text-[10px] font-bold tracking-widest text-outline-variant uppercase mb-2">Mar</div>
+<div class="text-center text-[10px] font-bold tracking-widest text-outline-variant uppercase mb-2">Mié</div>
+<div class="text-center text-[10px] font-bold tracking-widest text-outline-variant uppercase mb-2">Jue</div>
+<div class="text-center text-[10px] font-bold tracking-widest text-outline-variant uppercase mb-2">Vie</div>
+<div class="text-center text-[10px] font-bold tracking-widest text-outline-variant uppercase mb-2">Sáb</div>
+<div class="text-center text-[10px] font-bold tracking-widest text-outline-variant uppercase mb-2">Dom</div>
+<!-- Empty cells for padding -->
+<div class="aspect-square"></div>
+<div class="aspect-square"></div>
+<div class="aspect-square"></div>
+<div class="aspect-square"></div>
+<div class="aspect-square"></div>
+<!-- Calendar Days -->
+<div class="aspect-square flex items-center justify-center rounded-xl bg-surface-container-low text-on-surface/40 text-sm">1</div>
+<div class="aspect-square flex items-center justify-center rounded-xl bg-surface-container-low text-on-surface/40 text-sm">2</div>
+<!-- Active Thread Days -->
+<div class="aspect-square flex flex-col items-center justify-center rounded-xl bg-surface-container-high relative group cursor-pointer border border-primary/10">
+<span class="text-on-surface text-sm">3</span>
+<div class="w-1.5 h-1.5 rounded-full bg-primary mt-1 shadow-[0_0_8px_rgba(137,212,205,0.6)]"></div>
+</div>
+<div class="aspect-square flex flex-col items-center justify-center rounded-xl bg-surface-container-high relative group cursor-pointer">
+<span class="text-on-surface text-sm">4</span>
+<div class="w-1 h-1 rounded-full bg-secondary/60 mt-1"></div>
+</div>
+<div class="aspect-square flex flex-col items-center justify-center rounded-xl bg-surface-container-high relative group cursor-pointer border border-primary/30">
+<span class="text-on-surface text-sm">5</span>
+<div class="w-1.5 h-1.5 rounded-full bg-primary mt-1 shadow-[0_0_8px_rgba(137,212,205,0.6)]"></div>
+</div>
+<div class="aspect-square flex flex-col items-center justify-center rounded-xl bg-surface-container-high relative group cursor-pointer">
+<span class="text-on-surface text-sm">6</span>
+</div>
+<div class="aspect-square flex flex-col items-center justify-center rounded-xl bg-surface-container-high relative group cursor-pointer">
+<span class="text-on-surface text-sm">7</span>
+<div class="w-1.5 h-1.5 rounded-full bg-tertiary mt-1"></div>
+</div>
+<div class="aspect-square flex flex-col items-center justify-center rounded-xl bg-surface-container-high relative group cursor-pointer">
+<span class="text-on-surface text-sm">8</span>
+</div>
+<div class="aspect-square flex flex-col items-center justify-center rounded-xl bg-surface-container-high relative group cursor-pointer border-2 border-primary shadow-[0_0_15px_rgba(137,212,205,0.2)]">
+<span class="text-primary font-bold text-sm">9</span>
+<div class="w-1.5 h-1.5 rounded-full bg-primary mt-1 shadow-[0_0_8px_rgba(137,212,205,0.6)]"></div>
+</div>
+<!-- ... other days ... -->
+<div class="col-span-7 py-4 text-center">
+<span class="text-[10px] uppercase tracking-widest text-outline-variant">Desliza para ver más</span>
+</div>
+</div>
+</section>
+<!-- Activity Heatmap -->
+<section class="space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="text-sm font-medium tracking-widest uppercase text-outline">Intensidad Cognitiva</h2>
+<span class="text-[10px] text-primary bg-primary/10 px-2 py-0.5 rounded-full">Últimos 6 meses</span>
+</div>
+<div class="bg-surface-container p-6 rounded-3xl overflow-hidden">
+<div class="flex gap-1.5 items-end h-32">
+<!-- Bars -->
+<div class="flex-1 bg-surface-variant rounded-t-lg transition-all hover:bg-primary/40 h-[20%]"></div>
+<div class="flex-1 bg-surface-variant rounded-t-lg transition-all hover:bg-primary/40 h-[45%]"></div>
+<div class="flex-1 bg-surface-variant rounded-t-lg transition-all hover:bg-primary/40 h-[30%]"></div>
+<div class="flex-1 bg-primary/60 rounded-t-lg transition-all h-[85%] shadow-[0_0_20px_rgba(137,212,205,0.2)]"></div>
+<div class="flex-1 bg-surface-variant rounded-t-lg transition-all hover:bg-primary/40 h-[50%]"></div>
+<div class="flex-1 bg-surface-variant rounded-t-lg transition-all hover:bg-primary/40 h-[60%]"></div>
+<div class="flex-1 bg-surface-variant rounded-t-lg transition-all hover:bg-primary/40 h-[25%]"></div>
+<div class="flex-1 bg-secondary/40 rounded-t-lg transition-all h-[70%]"></div>
+<div class="flex-1 bg-surface-variant rounded-t-lg transition-all hover:bg-primary/40 h-[40%]"></div>
+<div class="flex-1 bg-surface-variant rounded-t-lg transition-all hover:bg-primary/40 h-[35%]"></div>
+<div class="flex-1 bg-primary/80 rounded-t-lg transition-all h-[95%] shadow-[0_0_25px_rgba(137,212,205,0.3)]"></div>
+<div class="flex-1 bg-surface-variant rounded-t-lg transition-all hover:bg-primary/40 h-[55%]"></div>
+<div class="flex-1 bg-surface-variant rounded-t-lg transition-all hover:bg-primary/40 h-[45%]"></div>
+<div class="flex-1 bg-tertiary/40 rounded-t-lg transition-all h-[60%]"></div>
+<div class="flex-1 bg-surface-variant rounded-t-lg transition-all hover:bg-primary/40 h-[30%]"></div>
+</div>
+<div class="flex justify-between mt-4 text-[10px] text-outline-variant uppercase tracking-tighter">
+<span>Mayo</span>
+<span>Junio</span>
+<span>Julio</span>
+<span>Agosto</span>
+<span>Septiembre</span>
+<span>Octubre</span>
+</div>
+</div>
+</section>
+<!-- Filters -->
+<section class="flex flex-wrap gap-3">
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-high border border-outline-variant/20 text-on-surface text-xs hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                Filtrar por nodo
+            </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-high border border-outline-variant/20 text-on-surface text-xs hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-sm">bolt</span>
+                Filtrar por intensidad
+            </button>
+<div class="ml-auto flex items-center gap-2 text-[10px] text-outline uppercase tracking-widest">
+<span>Viendo:</span>
+<span class="text-on-surface font-semibold">Todos los hilos</span>
+</div>
+</section>
+<!-- List of Selectable Days (The Archive) -->
+<section class="space-y-4">
+<h2 class="text-sm font-medium tracking-widest uppercase text-outline">Recuerdos Recientes</h2>
+<!-- Day Item -->
+<div class="group cursor-pointer p-5 rounded-3xl bg-surface-container hover:bg-surface-container-high transition-all duration-300 flex items-center gap-6">
+<div class="flex flex-col items-center">
+<span class="text-[10px] uppercase tracking-tighter text-outline-variant">Lunes</span>
+<span class="text-2xl font-light text-on-surface">09</span>
+</div>
+<div class="h-10 w-px bg-outline-variant/20"></div>
+<div class="flex-1 space-y-1">
+<h3 class="text-base font-medium text-on-surface">Claridad Post-Meditación</h3>
+<p class="text-xs text-on-surface-variant line-clamp-1">Nodos conectados: Ansiedad, Propósito, Calma...</p>
+<div class="flex gap-1.5 pt-1">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="w-2 h-2 rounded-full bg-primary/40"></div>
+<div class="w-2 h-2 rounded-full bg-secondary/40"></div>
+</div>
+</div>
+<button class="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-on-primary transition-all">
+<span class="material-symbols-outlined">replay</span>
+</button>
+</div>
+<!-- Day Item -->
+<div class="group cursor-pointer p-5 rounded-3xl bg-surface-container hover:bg-surface-container-high transition-all duration-300 flex items-center gap-6">
+<div class="flex flex-col items-center">
+<span class="text-[10px] uppercase tracking-tighter text-outline-variant">Viernes</span>
+<span class="text-2xl font-light text-on-surface">06</span>
+</div>
+<div class="h-10 w-px bg-outline-variant/20"></div>
+<div class="flex-1 space-y-1">
+<h3 class="text-base font-medium text-on-surface">Tensión en el Trabajo</h3>
+<p class="text-xs text-on-surface-variant line-clamp-1">Nodos conectados: Fatiga, Creatividad, Bloqueo...</p>
+<div class="flex gap-1.5 pt-1">
+<div class="w-2 h-2 rounded-full bg-error/60"></div>
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+</div>
+</div>
+<button class="flex items-center justify-center w-10 h-10 rounded-full bg-surface-variant text-on-surface-variant transition-all">
+<span class="material-symbols-outlined">replay</span>
+</button>
+</div>
+<!-- Day Item (Special Breakthrough) -->
+<div class="group cursor-pointer p-5 rounded-3xl bg-surface-container hover:bg-surface-container-high transition-all duration-300 flex items-center gap-6 border-l-4 border-tertiary">
+<div class="flex flex-col items-center">
+<span class="text-[10px] uppercase tracking-tighter text-outline-variant">Jueves</span>
+<span class="text-2xl font-light text-on-surface">05</span>
+</div>
+<div class="h-10 w-px bg-outline-variant/20"></div>
+<div class="flex-1 space-y-1">
+<h3 class="text-base font-medium text-tertiary flex items-center gap-2">
+                        Epifanía Creativa
+                        <span class="material-symbols-outlined text-sm">auto_awesome</span>
+</h3>
+<p class="text-xs text-on-surface-variant line-clamp-1">Un descubrimiento fundamental sobre la dirección del proyecto.</p>
+<div class="flex gap-1.5 pt-1">
+<div class="w-2 h-2 rounded-full bg-tertiary"></div>
+<div class="w-2 h-2 rounded-full bg-tertiary/60"></div>
+<div class="w-2 h-2 rounded-full bg-primary/60"></div>
+</div>
+</div>
+<button class="flex items-center justify-center w-10 h-10 rounded-full bg-tertiary/10 text-tertiary group-hover:bg-tertiary group-hover:text-on-tertiary transition-all">
+<span class="material-symbols-outlined">replay</span>
+</button>
+</div>
+</section>
+<!-- Visual Thread Network (Small Preview Component) -->
+<section class="bg-surface-container-lowest border border-outline-variant/10 rounded-[2.5rem] p-8 relative overflow-hidden h-64 flex flex-col justify-end">
+<div class="absolute inset-0 opacity-20 pointer-events-none">
+<!-- SVG Threads Background Simulation -->
+<svg fill="none" height="100%" viewbox="0 0 400 200" width="100%" xmlns="http://www.w3.org/2000/svg">
+<circle cx="50" cy="50" fill="#89d4cd" r="4"></circle>
+<circle cx="150" cy="80" fill="#89d4cd" r="6"></circle>
+<circle cx="280" cy="40" fill="#d3bcfc" r="3"></circle>
+<circle cx="340" cy="120" fill="#89d4cd" r="5"></circle>
+<path d="M50 50 L150 80" stroke="#89d4cd" stroke-dasharray="2 2" stroke-width="0.5"></path>
+<path d="M150 80 L280 40" stroke="#89d4cd" stroke-dasharray="2 2" stroke-width="0.5"></path>
+<path d="M150 80 L340 120" stroke="#89d4cd" stroke-dasharray="2 2" stroke-width="0.5"></path>
+</svg>
+</div>
+<div class="relative z-10 space-y-2">
+<span class="text-[10px] font-bold tracking-widest text-primary uppercase">Ecos del Pasado</span>
+<h3 class="text-xl font-light text-on-surface">Explora tu mapa mental histórico en modo inmersivo.</h3>
+<button class="mt-2 text-primary text-xs font-semibold flex items-center gap-1 group">
+                    Iniciar Viaje Temporal
+                    <span class="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
+</button>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-[#191a1a]/60 backdrop-blur-xl z-50 rounded-t-3xl border-t border-[#484848]/15 shadow-[0_-10px_40px_rgba(0,0,0,0.4)]">
+<a class="flex flex-col items-center justify-center text-[#e7e5e4]/60 px-4 py-2 hover:text-[#89d4cd]" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-manrope text-[10px] font-medium tracking-wider uppercase">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#89d4cd]/20 text-[#89d4cd] rounded-2xl px-4 py-2 shadow-[0_0_15px_rgba(137,212,205,0.2)]" href="#">
+<span class="material-symbols-outlined mb-1">history</span>
+<span class="font-manrope text-[10px] font-medium tracking-wider uppercase">Historial</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#e7e5e4]/60 px-4 py-2 hover:text-[#89d4cd]" href="#">
+<span class="material-symbols-outlined mb-1">auto_awesome</span>
+<span class="font-manrope text-[10px] font-medium tracking-wider uppercase">Perspectivas</span>
+</a>
+</nav>
+</body></html>

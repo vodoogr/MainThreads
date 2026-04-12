@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Nueva Entrada | Mental Threads</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#490006",
+                    "surface-variant": "#262626",
+                    "surface-container": "#191a1a",
+                    "surface-bright": "#2c2c2c",
+                    "surface": "#0e0e0e",
+                    "inverse-surface": "#fcf9f8",
+                    "tertiary-fixed": "#f9db7d",
+                    "tertiary-container": "#f9db7d",
+                    "inverse-on-surface": "#565555",
+                    "background": "#0e0e0e",
+                    "secondary-fixed": "#ebdcff",
+                    "on-primary-fixed": "#004844",
+                    "on-secondary": "#49366c",
+                    "secondary-fixed-dim": "#dfccff",
+                    "secondary": "#d3bcfc",
+                    "on-primary-container": "#adf9f2",
+                    "on-surface": "#e7e5e4",
+                    "on-tertiary-fixed-variant": "#6b5600",
+                    "on-tertiary-fixed": "#493a00",
+                    "surface-container-highest": "#262626",
+                    "surface-container-low": "#131313",
+                    "outline": "#767575",
+                    "tertiary-fixed-dim": "#eacd71",
+                    "error": "#fa746f",
+                    "surface-container-lowest": "#000000",
+                    "on-surface-variant": "#acabaa",
+                    "surface-dim": "#0e0e0e",
+                    "surface-tint": "#89d4cd",
+                    "on-background": "#e7e5e4",
+                    "inverse-primary": "#146a65",
+                    "on-secondary-fixed": "#48356b",
+                    "tertiary": "#ffeaaf",
+                    "on-tertiary-container": "#5f4c00",
+                    "on-primary": "#004944",
+                    "error-container": "#871f21",
+                    "primary-dim": "#7bc6bf",
+                    "tertiary-dim": "#eacd71",
+                    "primary": "#89d4cd",
+                    "primary-fixed": "#a4f0e9",
+                    "surface-container-high": "#1f2020",
+                    "on-secondary-fixed-variant": "#65518a",
+                    "on-tertiary": "#695400",
+                    "outline-variant": "#484848",
+                    "error-dim": "#c54d4a",
+                    "secondary-dim": "#c5aeed",
+                    "primary-container": "#01625d",
+                    "on-error-container": "#ff9993",
+                    "on-secondary-container": "#cbb5f4",
+                    "secondary-container": "#443167",
+                    "on-primary-fixed-variant": "#0d6661",
+                    "primary-fixed-dim": "#97e2db"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .intensity-slider::-webkit-slider-runnable-track {
+            background: #1f2020;
+            height: 6px;
+            border-radius: 3px;
+        }
+        .intensity-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #89d4cd;
+            margin-top: -7px;
+            box-shadow: 0 0 10px rgba(137, 212, 205, 0.4);
+        }
+        .thread-canvas {
+            background: radial-gradient(circle at 50% 0%, #191a1a 0%, #0e0e0e 70%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col items-center selection:bg-primary/30">
+<!-- TopAppBar -->
+<header class="bg-[#0e0e0e] docked full-width top-0 w-full z-50 flex justify-between items-center px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden">
+<img alt="Perfil del usuario" class="w-full h-full object-cover" data-alt="Soft focused portrait of a calm person with warm ambient lighting against a dark minimalist background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgZCYhxJeWYToFkG5HHumzqeTxLUX03cloT8iutE7rUE0vNn4gMAeB7xnwZcjoFETX5I5u5c8EQBMobeILC_O-F2Xp2DX-tD21n-nYIMfBNbXPaEfyoIa9zbG2Qv92qlXUk8ssrhUrspGjDiRCML1miAd1Ycc4khrdn7Ra29IyzXZbBZsgWYKvDGaAoFl3cgoolJE_pw0edAeYOogLvf_tnMnNVUNO4Lsb950Jyc6JTJFA_vMXn6JpqCFwmukDyiy5_mpnz4Vx2bo"/>
+</div>
+<span class="font-manrope text-sm tracking-widest uppercase text-[#484848]">Nueva Entrada</span>
+</div>
+<div class="text-lg font-bold text-[#e7e5e4] tracking-tight">Mental Threads</div>
+<button class="text-[#89d4cd] transition-colors duration-300 hover:bg-[#1f2020] p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+</button>
+</header>
+<!-- Main Content: Canvas de Escritura -->
+<main class="thread-canvas w-full max-w-2xl flex-1 flex flex-col px-6 pt-8 pb-32">
+<!-- Field: Título Opcional -->
+<div class="mb-8 group">
+<input class="w-full bg-transparent border-none text-headline-sm font-light text-on-surface-variant focus:text-on-surface focus:ring-0 placeholder:text-outline-variant/50 transition-all duration-300" placeholder="Título (opcional)" type="text"/>
+<div class="h-px w-0 group-focus-within:w-full bg-primary/30 transition-all duration-700 ease-out"></div>
+</div>
+<!-- Large Text Area -->
+<div class="flex-1 mb-10">
+<textarea class="w-full h-full min-h-[300px] bg-transparent border-none text-body-lg leading-relaxed text-on-surface placeholder:text-outline-variant/40 focus:ring-0 resize-none p-0" placeholder="Escribe lo que te preocupa hoy..." spellcheck="false"></textarea>
+</div>
+<!-- Bottom Controls Section -->
+<div class="space-y-10">
+<!-- Intensity Slider -->
+<div class="space-y-4">
+<div class="flex justify-between items-end">
+<label class="font-label text-[10px] tracking-wider uppercase text-outline-variant">Intensidad</label>
+<span class="text-primary font-bold text-xl">7</span>
+</div>
+<div class="relative w-full">
+<input class="intensity-slider w-full bg-transparent appearance-none cursor-pointer" max="10" min="1" type="range" value="7"/>
+<div class="flex justify-between mt-2 px-1">
+<span class="text-[9px] text-outline-variant">Leve</span>
+<span class="text-[9px] text-outline-variant">Agudo</span>
+</div>
+</div>
+</div>
+<!-- Suggested Nodes -->
+<div class="space-y-4">
+<label class="font-label text-[10px] tracking-wider uppercase text-outline-variant">Nodos sugeridos (Máx 3)</label>
+<div class="flex flex-wrap gap-2">
+<!-- Chip: Active/Selected -->
+<button class="px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium transition-all flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(137,212,205,0.8)]"></span>
+                        Pensamiento
+                    </button>
+<!-- Chip: Inactive -->
+<button class="px-4 py-2 rounded-full bg-surface-container text-on-surface-variant text-xs font-medium hover:bg-surface-container-high transition-all">
+                        Supervivencia
+                    </button>
+<button class="px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium transition-all flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(137,212,205,0.8)]"></span>
+                        Control
+                    </button>
+<button class="px-4 py-2 rounded-full bg-surface-container text-on-surface-variant text-xs font-medium hover:bg-surface-container-high transition-all">
+                        Relaciones
+                    </button>
+<button class="px-4 py-2 rounded-full bg-surface-container text-on-surface-variant text-xs font-medium hover:bg-surface-container-high transition-all">
+                        Cuerpo
+                    </button>
+<button class="px-4 py-2 rounded-full bg-surface-container text-on-surface-variant text-xs font-medium hover:bg-surface-container-high transition-all">
+                        Creatividad
+                    </button>
+<button class="px-4 py-2 rounded-full bg-surface-container text-on-surface-variant text-xs font-medium hover:bg-surface-container-high transition-all">
+                        Sentido
+                    </button>
+</div>
+</div>
+<!-- Main CTA Button -->
+<div class="pt-4">
+<button class="w-full py-5 rounded-xl bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold tracking-tight shadow-xl shadow-primary/10 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+<span class="material-symbols-outlined text-xl" data-icon="auto_awesome">auto_awesome</span>
+                    Guardar entrada
+                </button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-[#191a1a]/60 backdrop-blur-xl z-50 rounded-t-3xl border-t border-[#484848]/15 shadow-[0_-10px_40px_rgba(0,0,0,0.4)]">
+<!-- Item: Inicio -->
+<a class="flex flex-col items-center justify-center text-[#e7e5e4]/60 px-4 py-2 hover:text-[#89d4cd] transition-colors" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-manrope text-[10px] font-medium tracking-wider uppercase">Inicio</span>
+</a>
+<!-- Item: Historial -->
+<a class="flex flex-col items-center justify-center text-[#e7e5e4]/60 px-4 py-2 hover:text-[#89d4cd] transition-colors" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="history">history</span>
+<span class="font-manrope text-[10px] font-medium tracking-wider uppercase">Historial</span>
+</a>
+<!-- Item: Perspectivas -->
+<a class="flex flex-col items-center justify-center text-[#e7e5e4]/60 px-4 py-2 hover:text-[#89d4cd] transition-colors" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-manrope text-[10px] font-medium tracking-wider uppercase">Perspectivas</span>
+</a>
+</nav>
+<!-- Background Decorative Threads -->
+<div class="fixed inset-0 pointer-events-none -z-10 opacity-20 overflow-hidden">
+<svg class="w-full h-full" viewbox="0 0 400 800" xmlns="http://www.w3.org/2000/svg">
+<path d="M-50,200 Q150,250 100,500 T350,750" fill="none" stroke="#89d4cd" stroke-width="0.5"></path>
+<path d="M450,100 Q250,300 300,500 T-50,850" fill="none" stroke="#d3bcfc" stroke-width="0.5"></path>
+<circle class="animate-pulse" cx="100" cy="500" fill="#89d4cd" r="2"></circle>
+<circle cx="300" cy="500" fill="#d3bcfc" r="2"></circle>
+</svg>
+</div>
+</body></html>

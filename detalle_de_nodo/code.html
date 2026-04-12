@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#490006",
+                    "surface-variant": "#262626",
+                    "surface-container": "#191a1a",
+                    "surface-bright": "#2c2c2c",
+                    "surface": "#0e0e0e",
+                    "inverse-surface": "#fcf9f8",
+                    "tertiary-fixed": "#f9db7d",
+                    "tertiary-container": "#f9db7d",
+                    "inverse-on-surface": "#565555",
+                    "background": "#0e0e0e",
+                    "secondary-fixed": "#ebdcff",
+                    "on-primary-fixed": "#004844",
+                    "on-secondary": "#49366c",
+                    "secondary-fixed-dim": "#dfccff",
+                    "secondary": "#d3bcfc",
+                    "on-primary-container": "#adf9f2",
+                    "on-surface": "#e7e5e4",
+                    "on-tertiary-fixed-variant": "#6b5600",
+                    "on-tertiary-fixed": "#493a00",
+                    "surface-container-highest": "#262626",
+                    "surface-container-low": "#131313",
+                    "outline": "#767575",
+                    "tertiary-fixed-dim": "#eacd71",
+                    "error": "#fa746f",
+                    "surface-container-lowest": "#000000",
+                    "on-surface-variant": "#acabaa",
+                    "surface-dim": "#0e0e0e",
+                    "surface-tint": "#89d4cd",
+                    "on-background": "#e7e5e4",
+                    "inverse-primary": "#146a65",
+                    "on-secondary-fixed": "#48356b",
+                    "tertiary": "#ffeaaf",
+                    "on-tertiary-container": "#5f4c00",
+                    "on-primary": "#004944",
+                    "error-container": "#871f21",
+                    "primary-dim": "#7bc6bf",
+                    "tertiary-dim": "#eacd71",
+                    "primary": "#89d4cd",
+                    "primary-fixed": "#a4f0e9",
+                    "surface-container-high": "#1f2020",
+                    "on-secondary-fixed-variant": "#65518a",
+                    "on-tertiary": "#695400",
+                    "outline-variant": "#484848",
+                    "error-dim": "#c54d4a",
+                    "secondary-dim": "#c5aeed",
+                    "primary-container": "#01625d",
+                    "on-error-container": "#ff9993",
+                    "on-secondary-container": "#cbb5f4",
+                    "secondary-container": "#443167",
+                    "on-primary-fixed-variant": "#0d6661",
+                    "primary-fixed-dim": "#97e2db"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #0e0e0e;
+            color: #e7e5e4;
+        }
+        .ethereal-blur {
+            backdrop-filter: blur(20px);
+            background-color: rgba(38, 38, 38, 0.6);
+        }
+        .thought-node-glow {
+            box-shadow: 0 0 15px rgba(137, 212, 205, 0.2);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased min-h-screen">
+<!-- Top Navigation Placeholder (Hidden for Detail View per Shell Visibility Rules) -->
+<header class="bg-[#0e0e0e] text-[#89d4cd] font-manrope text-sm tracking-widest uppercase flex justify-between items-center px-6 py-4 w-full fixed top-0 z-40">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant/15 flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="close-up portrait of a man with calm expression in soft moody lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCtLxgza-CatMcpOG5JngcofEA_2Yx6UKQXDRTJ1unoNicNJ_l7b2r8ME_6soWTVR0W-7-y3OCrMg3fSQnG67QjKWDQMHaLqW9f6iRP1Bb1N_kfsvaKhH1KfcwejidVj5C3QamOGsGf0P-az1ftNFz_6OSkGZ0dGudvMo-EWdCScB7piQb-0GBzsOWvkz598Z_zvee8lvnTfxrYKE2OnbLdRxadDz5DIa92SfuCayDrJhdBLCSfoN_TjSBgf_VRhH-KoAOzz_6Yto"/>
+</div>
+<span class="text-lg font-bold text-[#e7e5e4] tracking-tight">Mental Threads</span>
+</div>
+<button class="material-symbols-outlined text-[#89d4cd]">calendar_today</button>
+</header>
+<!-- Main Content Canvas (Background Nodes) -->
+<main class="pt-24 px-6 pb-32">
+<div class="opacity-20 flex flex-col gap-12 pointer-events-none">
+<div class="h-40 w-full bg-surface-container rounded-3xl thought-node-glow"></div>
+<div class="h-64 w-full bg-surface-container-high rounded-3xl"></div>
+</div>
+</main>
+<!-- Modal Overlay -->
+<div class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50">
+<!-- Bottom Sheet Container -->
+<div class="fixed bottom-0 left-0 right-0 max-w-2xl mx-auto bg-surface-container-low rounded-t-[2.5rem] border-t border-outline-variant/15 shadow-[0_-20px_60px_rgba(0,0,0,0.6)] flex flex-col max-h-[813px] overflow-hidden">
+<!-- Handle & Header -->
+<div class="flex flex-col items-center pt-4 pb-2">
+<div class="w-12 h-1 bg-outline-variant/30 rounded-full mb-6"></div>
+<div class="w-full px-8 flex justify-between items-start">
+<div>
+<span class="text-[10px] font-bold tracking-[0.2em] text-primary uppercase mb-1 block">Detalle de Nodo</span>
+<h1 class="text-3xl font-extrabold text-on-surface tracking-tight leading-none">Pensamiento / Sobrecarga</h1>
+</div>
+<button class="w-10 h-10 rounded-full bg-surface-variant/50 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">close</span>
+</button>
+</div>
+</div>
+<!-- Scrollable Content -->
+<div class="overflow-y-auto px-8 pb-12 pt-4 no-scrollbar">
+<!-- Description -->
+<p class="text-on-surface-variant text-lg leading-relaxed font-light mb-10">
+                    Tus procesos mentales activos y carga cognitiva. Este nodo representa la acumulación de tareas pendientes y la fragmentación de la atención durante las últimas jornadas.
+                </p>
+<!-- Stats Grid (Bento Style) -->
+<div class="grid grid-cols-2 gap-4 mb-10">
+<div class="bg-surface-container p-6 rounded-[2rem] flex flex-col justify-between">
+<span class="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase">Nivel de Activación</span>
+<div class="mt-4 flex items-end gap-2">
+<span class="text-4xl font-bold text-primary">84%</span>
+<span class="material-symbols-outlined text-primary pb-1" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+</div>
+<div class="w-full bg-outline-variant/20 h-1 rounded-full mt-4 overflow-hidden">
+<div class="bg-primary h-full w-[84%] rounded-full thought-node-glow"></div>
+</div>
+</div>
+<div class="bg-surface-container p-6 rounded-[2rem] flex flex-col justify-between">
+<span class="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase">Frecuencia</span>
+<div class="mt-4">
+<span class="text-4xl font-bold text-secondary">Alta</span>
+</div>
+<p class="text-[11px] text-on-surface-variant mt-2 leading-tight">Detectado en 12 de los últimos 14 días.</p>
+</div>
+</div>
+<!-- Trend Graph Section -->
+<div class="mb-10">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-sm font-bold tracking-widest text-on-surface-variant uppercase">Tendencia 30 Días</h3>
+<div class="flex gap-4">
+<span class="text-[10px] font-bold text-primary tracking-widest uppercase">7D</span>
+<span class="text-[10px] font-bold text-on-surface-variant/40 tracking-widest uppercase">30D</span>
+</div>
+</div>
+<div class="relative h-32 w-full flex items-end justify-between px-2">
+<!-- Custom Abstract Graph (Tonal Depth) -->
+<div class="w-3 bg-surface-variant h-[40%] rounded-full"></div>
+<div class="w-3 bg-surface-variant h-[60%] rounded-full"></div>
+<div class="w-3 bg-primary/40 h-[85%] rounded-full"></div>
+<div class="w-3 bg-primary h-[95%] rounded-full thought-node-glow"></div>
+<div class="w-3 bg-primary/60 h-[75%] rounded-full"></div>
+<div class="w-3 bg-surface-variant h-[50%] rounded-full"></div>
+<div class="w-3 bg-surface-variant h-[30%] rounded-full"></div>
+<div class="w-3 bg-primary/30 h-[65%] rounded-full"></div>
+<div class="w-3 bg-primary/80 h-[90%] rounded-full"></div>
+<div class="w-3 bg-surface-variant h-[45%] rounded-full"></div>
+</div>
+</div>
+<!-- Connections Section -->
+<div class="mb-10">
+<h3 class="text-sm font-bold tracking-widest text-on-surface-variant uppercase mb-6">Conexiones más fuertes</h3>
+<div class="flex flex-wrap gap-3">
+<div class="flex items-center gap-3 bg-surface-container-high px-5 py-3 rounded-full border border-outline-variant/10">
+<div class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(211,188,252,0.4)]"></div>
+<span class="text-sm font-medium">Ansiedad</span>
+<span class="text-xs text-on-surface-variant/60 font-mono">0.82</span>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-high px-5 py-3 rounded-full border border-outline-variant/10">
+<div class="w-2 h-2 rounded-full bg-tertiary shadow-[0_0_8px_rgba(255,234,175,0.4)]"></div>
+<span class="text-sm font-medium">Creatividad</span>
+<span class="text-xs text-on-surface-variant/60 font-mono">0.45</span>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-high px-5 py-3 rounded-full border border-outline-variant/10">
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+<span class="text-sm font-medium">Trabajo</span>
+<span class="text-xs text-on-surface-variant/60 font-mono">0.91</span>
+</div>
+</div>
+</div>
+<!-- Related Entries -->
+<div class="mb-4">
+<h3 class="text-sm font-bold tracking-widest text-on-surface-variant uppercase mb-6">Entradas relacionadas</h3>
+<div class="space-y-4">
+<div class="bg-surface-container-low border-l-2 border-primary/30 p-5 rounded-r-2xl">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Hoy, 09:42 AM</span>
+<span class="material-symbols-outlined text-xs text-on-surface-variant">arrow_forward_ios</span>
+</div>
+<p class="text-sm font-light text-on-surface line-clamp-2 italic">"Siento que hay demasiados hilos sueltos en el proyecto actual. La cabeza me da vueltas con la entrega de mañana..."</p>
+</div>
+<div class="bg-surface-container-low border-l-2 border-outline-variant/30 p-5 rounded-r-2xl">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Ayer, 11:15 PM</span>
+<span class="material-symbols-outlined text-xs text-on-surface-variant">arrow_forward_ios</span>
+</div>
+<p class="text-sm font-light text-on-surface line-clamp-2 italic">"Dificultad para desconectar. El ruido mental persiste incluso después de la meditación."</p>
+</div>
+</div>
+</div>
+<!-- Action Button -->
+<div class="mt-8">
+<button class="w-full py-5 rounded-2xl bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold tracking-widest uppercase text-xs shadow-lg shadow-primary/10">
+                        Sintonizar este Hilo
+                    </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Navigation (BottomNavBar) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-[#191a1a]/60 backdrop-blur-xl border-t border-[#484848]/15 shadow-[0_-10px_40px_rgba(0,0,0,0.4)] z-50 rounded-t-3xl md:hidden">
+<div class="flex flex-col items-center justify-center text-[#e7e5e4]/60 px-4 py-2 hover:text-[#89d4cd] transition-colors duration-300">
+<span class="material-symbols-outlined text-2xl">home</span>
+<span class="font-manrope text-[10px] font-medium tracking-wider uppercase mt-1">Inicio</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#e7e5e4]/60 px-4 py-2 hover:text-[#89d4cd] transition-colors duration-300">
+<span class="material-symbols-outlined text-2xl">history</span>
+<span class="font-manrope text-[10px] font-medium tracking-wider uppercase mt-1">Historial</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-[#89d4cd]/20 text-[#89d4cd] rounded-2xl px-4 py-2 shadow-[0_0_15px_rgba(137,212,205,0.2)]">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="font-manrope text-[10px] font-medium tracking-wider uppercase mt-1">Perspectivas</span>
+</div>
+</nav>
+</body></html>
