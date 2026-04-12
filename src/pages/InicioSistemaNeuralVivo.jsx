@@ -3,7 +3,7 @@ import ScreenContainer from '../components/ScreenContainer';
 import SummaryCard from '../components/SummaryCard';
 import EntryCard from '../components/EntryCard';
 import BrainGraph from '../components/BrainGraph';
-import { dailySummary, recentThoughts } from '../data/mockData';
+import { dailySummary, recentThoughts, graphData } from '../data/mockData';
 
 export default function InicioSistemaNeuralVivo() {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ export default function InicioSistemaNeuralVivo() {
     <ScreenContainer>
       <div className="section-gap" style={{ paddingTop: '2rem' }}>
         {/* Brain Graph Area */}
-        <BrainGraph />
+        <BrainGraph data={graphData} />
 
         {/* Summary Cards Bento Grid */}
         <div
