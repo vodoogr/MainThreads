@@ -3,124 +3,130 @@ import { useNavigate } from 'react-router-dom';
 import * as d3 from 'd3';
 import {
   CIRCUIT_IDS,
-  CIRCUIT_LABELS,
   CIRCUIT_COLORS,
   CIRCUIT_DESCRIPTIONS,
   circuitEntries,
   graphData as fallbackData,
 } from '../data/mockData';
 
-// ─── Label mapping: internal ID → Spanish display label ─────────────────────
+// ─── Spanish display labels (no internal English IDs shown) ─────────────────
 const DISPLAY_LABELS = {
-  [CIRCUIT_IDS.BIO_SURVIVAL]:      'Bio-Supervivencia',
-  [CIRCUIT_IDS.EMOTIONAL]:         'Emocional-Territorial',
-  [CIRCUIT_IDS.SYMBOLIC]:          'Simbólico-Semántico',
-  [CIRCUIT_IDS.SOCIO_SEXUAL]:      'Socio-Sexual (Moral)',
-  [CIRCUIT_IDS.NEUROSOMATIC]:      'Neurosomático (Éxtasis)',
-  [CIRCUIT_IDS.METAPROGRAMMING]:   'Meta-Programación',
-  [CIRCUIT_IDS.NEUROGENETIC]:      'Neurogenético (Memoria)',
-  [CIRCUIT_IDS.QUANTUM]:           'Cuántico (No-Local)',
-  // Compatibility with legacy CIRCUIT_IDS keys if mockData uses them:
-  SURVIVAL:       'Supervivencia / Seguridad',
-  RELATIONSHIPS:  'Relaciones',
-  CONTROL:        'Control / Autoestima',
-  OVERTHINKING:   'Pensamiento / Sobrecarga',
-  BODY:           'Cuerpo / Sensaciones',
-  CREATIVITY:     'Creatividad / Expresión',
-  MEANING:        'Sentido / Propósito',
+  [CIRCUIT_IDS.BIO_SURVIVAL]:    'Bio-Supervivencia',
+  [CIRCUIT_IDS.EMOTIONAL]:       'Emocional',
+  [CIRCUIT_IDS.SYMBOLIC]:        'Simbólico',
+  [CIRCUIT_IDS.SOCIO_SEXUAL]:    'Socio-Sexual',
+  [CIRCUIT_IDS.NEUROSOMATIC]:    'Neurosomático',
+  [CIRCUIT_IDS.METAPROGRAMMING]: 'Meta-Progr.',
+  [CIRCUIT_IDS.NEUROGENETIC]:    'Neurogenético',
+  [CIRCUIT_IDS.QUANTUM]:         'Cuántico',
+  SURVIVAL:      'Supervivencia',
+  RELATIONSHIPS: 'Relaciones',
+  CONTROL:       'Control',
+  OVERTHINKING:  'Pensamiento',
+  BODY:          'Cuerpo',
+  CREATIVITY:    'Creatividad',
+  MEANING:       'Sentido',
 };
 
-// ─── Anatomical anchors: each circuit pinned to a % of the SVG viewport ─────
-// SVG is 900×500. Left hemisphere (terrestre) x ≈ 60–350; Right (post-terrestre) x ≈ 550–840
+// ─── Anatomical anchors: fixed positions inside the brain image ──────────────
+// SVG viewBox 900×500. Left (terrestrial) x≈80-380; Right (post-terrestrial) x≈520-840
 const ANCHORS = {
-  // LEFT — Terrestrial (Subcortical → Prefrontal)
-  [CIRCUIT_IDS.BIO_SURVIVAL]:    { cx: 160, cy: 370 },  // Tronco (base izq)
-  [CIRCUIT_IDS.EMOTIONAL]:       { cx: 200, cy: 260 },  // Límbico
-  [CIRCUIT_IDS.SYMBOLIC]:        { cx: 250, cy: 160 },  // Neocórtex Izq
-  [CIRCUIT_IDS.SOCIO_SEXUAL]:    { cx: 310, cy: 100 },  // Prefrontal Izq
-  // RIGHT — Post-terrestrial (Somático → Cuántico)
-  [CIRCUIT_IDS.NEUROSOMATIC]:    { cx: 580, cy: 270 },  // Somático Der
-  [CIRCUIT_IDS.METAPROGRAMMING]: { cx: 650, cy: 150 },  // Asociación Der
-  [CIRCUIT_IDS.NEUROGENETIC]:    { cx: 730, cy: 210 },  // ADN Der
-  [CIRCUIT_IDS.QUANTUM]:         { cx: 780, cy: 110 },  // No-local (vértice)
-  // Fallback for legacy 7-node mockData
-  SURVIVAL:      { cx: 160, cy: 360 },
-  RELATIONSHIPS: { cx: 210, cy: 240 },
-  CONTROL:       { cx: 270, cy: 155 },
-  OVERTHINKING:  { cx: 340, cy: 105 },
-  BODY:          { cx: 570, cy: 270 },
-  CREATIVITY:    { cx: 660, cy: 170 },
-  MEANING:       { cx: 750, cy: 120 },
+  [CIRCUIT_IDS.BIO_SURVIVAL]:    { cx: 155, cy: 360 },
+  [CIRCUIT_IDS.EMOTIONAL]:       { cx: 205, cy: 255 },
+  [CIRCUIT_IDS.SYMBOLIC]:        { cx: 268, cy: 162 },
+  [CIRCUIT_IDS.SOCIO_SEXUAL]:    { cx: 345, cy: 108 },
+  [CIRCUIT_IDS.NEUROSOMATIC]:    { cx: 560, cy: 262 },
+  [CIRCUIT_IDS.METAPROGRAMMING]: { cx: 645, cy: 152 },
+  [CIRCUIT_IDS.NEUROGENETIC]:    { cx: 725, cy: 208 },
+  [CIRCUIT_IDS.QUANTUM]:         { cx: 792, cy: 112 },
+  // legacy
+  SURVIVAL: { cx: 155, cy: 360 }, RELATIONSHIPS: { cx: 210, cy: 250 },
+  CONTROL:  { cx: 270, cy: 158 }, OVERTHINKING:  { cx: 340, cy: 108 },
+  BODY:     { cx: 560, cy: 265 }, CREATIVITY:    { cx: 650, cy: 158 },
+  MEANING:  { cx: 750, cy: 118 },
 };
 
-// Left-hemisphere circuit ids for balance calculation
 const LEFT_IDS = new Set([
   CIRCUIT_IDS.BIO_SURVIVAL, CIRCUIT_IDS.EMOTIONAL,
   CIRCUIT_IDS.SYMBOLIC, CIRCUIT_IDS.SOCIO_SEXUAL,
   'SURVIVAL', 'RELATIONSHIPS', 'CONTROL', 'OVERTHINKING',
 ]);
 
+// ── Float animation offsets (subtle sinusoidal per-node) ────────────────────
+const FLOAT_PARAMS = {};
+const getFloat = (id) => {
+  if (!FLOAT_PARAMS[id]) {
+    FLOAT_PARAMS[id] = {
+      amp:   3 + Math.random() * 3,         // 3–6 px amplitude
+      freq:  0.0008 + Math.random() * 0.0006,// period ≈ 7–15 s
+      phase: Math.random() * Math.PI * 2,
+    };
+  }
+  return FLOAT_PARAMS[id];
+};
+
 /**
  * BrainGraph
- *
- * Props:
- *   data?: { nodes: Node[], links: Link[] }
- *     Node: { id: string, intensity?: number, color?: string, name?: string }
- *     Link: { source: string, target: string }
- *   If omitted, falls back to mockData.
+ * Props: data?: { nodes: Node[], links: Link[] }
  */
 export default function BrainGraph({ data }) {
   const navigate = useNavigate();
-  const svgRef = useRef(null);
-  const simRef = useRef(null);
+  const svgRef  = useRef(null);
+  const rafRef  = useRef(null);
 
-  // ── Graph state ────────────────────────────────────────────────────────────
-  const [expandedIds, setExpandedIds] = useState(new Set());
-  const [hoveredNode, setHoveredNode] = useState(null);
+  const [expandedIds, setExpandedIds]  = useState(new Set());
+  const [hoveredNode, setHoveredNode]  = useState(null);
+  // Track if a node was just clicked (to avoid double-fire)
+  const clickLock = useRef(false);
 
-  // ── Normalise incoming data (support both {nodes,links} shapes) ────────────
-  const graphData = useMemo(() => {
-    const raw = data || fallbackData;
-    return {
-      nodes: raw.nodes ?? [],
-      links: raw.links ?? [],
-    };
-  }, [data]);
+  // ── Normalise data ────────────────────────────────────────────────────────
+  const graphData = useMemo(() => ({
+    nodes: (data ?? fallbackData).nodes ?? [],
+    links: (data ?? fallbackData).links ?? [],
+  }), [data]);
 
-  // ── Dominant node (highest intensity) ─────────────────────────────────────
-  const dominantId = useMemo(() => {
-    if (!graphData.nodes.length) return null;
-    return graphData.nodes.reduce((a, b) =>
-      (a.intensity ?? 0) > (b.intensity ?? 0) ? a : b
-    ).id;
-  }, [graphData.nodes]);
+  // ── Dominante ─────────────────────────────────────────────────────────────
+  const dominantId = useMemo(() =>
+    graphData.nodes.length
+      ? graphData.nodes.reduce((a, b) => (a.intensity ?? 0) > (b.intensity ?? 0) ? a : b).id
+      : null
+  , [graphData.nodes]);
 
-  // ── Hemisphere balance analytics ──────────────────────────────────────────
+  // ── Balance analytics ──────────────────────────────────────────────────────
   const balance = useMemo(() => {
-    let lSum = 0, rSum = 0;
+    let l = 0, r = 0;
     graphData.nodes.forEach(n => {
-      const v = n.intensity ?? 0.5;
-      LEFT_IDS.has(n.id) ? (lSum += v) : (rSum += v);
+      LEFT_IDS.has(n.id) ? (l += n.intensity ?? 0.5) : (r += n.intensity ?? 0.5);
     });
-    const total = lSum + rSum || 1;
-    const lP = Math.round((lSum / total) * 100);
-    const rP = 100 - lP;
+    const tot = l + r || 1;
+    const lP  = Math.round((l / tot) * 100);
     return {
-      left: lP, right: rP,
-      dominant: lP >= rP ? 'Izquierdo (Terrestre)' : 'Derecho (Post-terrestre)',
-      color: lP >= rP ? '#60b8ff' : '#ff6eb4',
+      left: lP, right: 100 - lP,
+      dominant: lP >= 50 ? 'Izquierdo (Terrestre)' : 'Derecho (Post-terrestre)',
+      color:    lP >= 50 ? '#60b8ff' : '#ff6eb4',
     };
   }, [graphData.nodes]);
 
-  // ── Build full node + link set from graph data + expanded sub-nodes ────────
+  // ── Entry counts per circuit (always available even when collapsed) ────────
+  const entryCounts = useMemo(() => {
+    const counts = {};
+    graphData.nodes.forEach(n => {
+      counts[n.id] = (circuitEntries[n.id] ?? []).length;
+    });
+    return counts;
+  }, [graphData.nodes]);
+
+  // ── Build node + link dataset ─────────────────────────────────────────────
   const { nodes, links } = useMemo(() => {
     const nodes = graphData.nodes.map(n => ({
       ...n,
-      _label: DISPLAY_LABELS[n.id] ?? n.name ?? n.id,
-      _color: CIRCUIT_COLORS[n.id] ?? n.color ?? '#ffffff',
+      _label:      DISPLAY_LABELS[n.id] ?? n.name ?? n.id,
+      _color:      CIRCUIT_COLORS[n.id] ?? n.color ?? '#fff',
       _isDominant: n.id === dominantId,
-      _type: 'circuit',
-      // Anchor to anatomical position (fixed)
+      _type:       'circuit',
+      _count:      (circuitEntries[n.id] ?? []).length,
+      _expanded:   expandedIds.has(n.id),
+      // anchor = fixed position in brain zone
       fx: ANCHORS[n.id]?.cx ?? null,
       fy: ANCHORS[n.id]?.cy ?? null,
     }));
@@ -128,26 +134,32 @@ export default function BrainGraph({ data }) {
     const links = graphData.links.map(l => ({ ...l, _type: 'core' }));
 
     expandedIds.forEach(cid => {
-      const entries = circuitEntries[cid] ?? [];
       const parent = nodes.find(n => n.id === cid);
-      const anchor = ANCHORS[cid] ?? { cx: 450, cy: 250 };
+      if (!parent) return;
+      const anchor  = ANCHORS[cid] ?? { cx: 450, cy: 250 };
+      const entries = circuitEntries[cid] ?? [];
+      const isLeft  = LEFT_IDS.has(cid);
 
       entries.forEach((e, i) => {
-        const sid = `sub-${cid}-${e.id}`;
-        const angle = (2 * Math.PI * i) / entries.length;
+        const sid   = `sub-${cid}-${e.id}`;
+        const angle = (Math.PI / (entries.length + 1)) * (i + 1)
+                      + (isLeft ? Math.PI * 0.5 : -Math.PI * 0.5);
+        const r     = 58 + i * 10;
+
         nodes.push({
-          id: sid,
-          _label: e.text,
-          _color: parent?._color ?? '#aaa',
-          _isDominant: false,
-          _type: 'entry',
-          parentId: cid,
-          intensity: e.intensity ?? 3,
-          // Start near parent, then float freely
-          x: anchor.cx + Math.cos(angle) * 50,
-          y: anchor.cy + Math.sin(angle) * 50,
+          id:         sid,
+          _label:     e.text,
+          _color:     parent._color,
+          _isDominant:false,
+          _type:      'entry',
+          _count:     0,
+          _expanded:  false,
+          parentId:   cid,
+          intensity:  e.intensity ?? 3,
+          x: anchor.cx + Math.cos(angle) * r,
+          y: anchor.cy + Math.sin(angle) * r,
         });
-        links.push({ source: cid, target: sid, _type: 'entry' });
+        links.push({ source: cid, target: sid, _type: 'entry', _color: parent._color });
       });
     });
 
@@ -155,97 +167,166 @@ export default function BrainGraph({ data }) {
   }, [graphData, expandedIds, dominantId]);
 
   // ── D3 Simulation ─────────────────────────────────────────────────────────
-  // Dependency list: only structural data (nodes/links/expandedIds/dominantId)
-  // hoveredNode intentionally EXCLUDED to avoid resetting the simulation on hover.
   useEffect(() => {
     const svg = d3.select(svgRef.current);
     const W = 900, H = 500;
 
     svg.selectAll('.sim-layer').remove();
-    const root = svg.append('g').attr('class', 'sim-layer');
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
 
-    // ── SVG Defs: glow filters ──────────────────────────────────────────────
-    const defs = svg.select('defs');
+    const root   = svg.append('g').attr('class', 'sim-layer');
+    const defsEl = svg.select('defs');
 
-    const makeGlow = (id, color, stdDev, opacity) => {
-      defs.select(`#${id}`).remove();
-      const f = defs.append('filter').attr('id', id).attr('x', '-50%').attr('y', '-50%').attr('width', '200%').attr('height', '200%');
-      f.append('feColorMatrix').attr('type', 'matrix').attr('values', `0 0 0 0 ${parseInt(color.slice(1,3),16)/255} 0 0 0 0 ${parseInt(color.slice(3,5),16)/255} 0 0 0 0 ${parseInt(color.slice(5,7),16)/255} 0 0 0 ${opacity} 0`);
-      f.append('feGaussianBlur').attr('stdDeviation', stdDev).attr('result', 'blur');
-      f.append('feComposite').attr('in', 'SourceGraphic').attr('in2', 'blur').attr('operator', 'over');
+    // ── Glow SVG filters ────────────────────────────────────────────────────
+    const makeGlow = (id, std) => {
+      defsEl.select(`#${id}`).remove();
+      const f = defsEl.append('filter').attr('id', id)
+        .attr('x', '-60%').attr('y', '-60%')
+        .attr('width', '220%').attr('height', '220%');
+      f.append('feGaussianBlur').attr('in', 'SourceGraphic').attr('stdDeviation', std).attr('result', 'blur');
+      f.append('feMerge').selectAll('feMergeNode')
+        .data(['blur', 'SourceGraphic'])
+        .join('feMergeNode')
+        .attr('in', d => d);
     };
+    makeGlow('glow-sm', 4);
+    makeGlow('glow-lg', 14);
 
-    // Pre-generate glow filters per unique color
-    const usedColors = [...new Set(nodes.map(n => n._color).filter(c => c?.startsWith('#') && c.length === 7))];
-    usedColors.forEach(c => {
-      const safe = c.replace('#', 'col');
-      makeGlow(`glow-${safe}`, c, 8, 18);
-      makeGlow(`glow-dom-${safe}`, c, 18, 28);
-    });
-
-    const getFilter = (n) => {
-      if (!n._color?.startsWith('#') || n._color.length !== 7) return null;
-      const safe = n._color.replace('#', 'col');
-      return n._isDominant ? `url(#glow-dom-${safe})` : `url(#glow-${safe})`;
-    };
-
-    // ── Links ───────────────────────────────────────────────────────────────
+    // ── Links ────────────────────────────────────────────────────────────────
     const linkSel = root.append('g').attr('class', 'links')
-      .selectAll('line')
-      .data(links)
-      .join('line')
-      .attr('stroke', d => d._type === 'core' ? 'rgba(255,255,255,0.08)' : d._color ?? 'rgba(255,255,255,0.2)')
-      .attr('stroke-width', d => d._type === 'core' ? 1.2 : 1.5)
-      .attr('stroke-dasharray', d => d._type === 'core' ? '4 6' : null)
-      .attr('opacity', 0.7);
+      .selectAll('line').data(links).join('line')
+      .attr('stroke', d => d._type === 'core' ? 'rgba(255,255,255,0.06)' : (d._color ?? 'rgba(255,255,255,0.18)'))
+      .attr('stroke-width', d => d._type === 'core' ? 1 : 1.4)
+      .attr('stroke-dasharray', d => d._type === 'core' ? '5 7' : null)
+      .attr('opacity', 0.8);
 
-    // ── Nodes ───────────────────────────────────────────────────────────────
+    // ── Node groups ──────────────────────────────────────────────────────────
     const nodeSel = root.append('g').attr('class', 'nodes')
-      .selectAll('g')
-      .data(nodes, d => d.id)
+      .selectAll('g').data(nodes, d => d.id)
       .join(enter => {
-        const g = enter.append('g').attr('cursor', 'pointer').attr('opacity', 0);
-        g.transition().duration(400).attr('opacity', 1);
+        const g = enter.append('g')
+          .attr('cursor', 'pointer')
+          .attr('opacity', 0)
+          .call(sel => sel.transition().duration(350).attr('opacity', 1));
         return g;
       });
 
-    // Outer glow ring (dominant only)
-    nodeSel.filter(d => d._isDominant)
-      .append('circle')
-      .attr('r', d => nodeR(d) + 12)
+    // Outer ring (hover / expand indicator)
+    nodeSel.filter(d => d._type === 'circuit').append('circle')
+      .attr('class', 'ring')
+      .attr('r', d => nodeR(d) + 9)
       .attr('fill', 'none')
       .attr('stroke', d => d._color)
-      .attr('stroke-width', 1)
-      .attr('opacity', 0.3)
-      .attr('filter', d => getFilter(d));
+      .attr('stroke-width', d => d._expanded ? 1.5 : 0.5)
+      .attr('stroke-dasharray', d => d._expanded ? null : '3 4')
+      .attr('opacity', d => d._expanded ? 0.6 : 0.25)
+      .attr('filter', 'url(#glow-sm)');
 
-    // Main circle
-    nodeSel.append('circle')
+    // Dominant pulse ring
+    nodeSel.filter(d => d._isDominant).append('circle')
+      .attr('r', d => nodeR(d) + 22)
+      .attr('fill', 'none')
+      .attr('stroke', d => d._color)
+      .attr('stroke-width', 0.8)
+      .attr('opacity', 0.18)
+      .attr('filter', 'url(#glow-lg)');
+
+    // Main circle (circuit) — 3D illusion via gradient fill
+    defsEl.selectAll('.node-grad').remove();
+    nodes.filter(n => n._type === 'circuit').forEach(n => {
+      const gradId = `grad-${n.id.replace(/[^a-z0-9]/gi, '')}`;
+      defsEl.select(`#${gradId}`).remove();
+      const col = d3.color(n._color);
+      const light = col ? col.brighter(0.9).formatHex() : '#fff';
+      const dark  = col ? col.darker(1.4).formatHex() : '#000';
+      const grad = defsEl.append('radialGradient')
+        .attr('id', gradId).attr('class', 'node-grad')
+        .attr('cx', '35%').attr('cy', '30%').attr('r', '65%');
+      grad.append('stop').attr('offset', '0%').attr('stop-color', light).attr('stop-opacity', 1);
+      grad.append('stop').attr('offset', '100%').attr('stop-color', dark).attr('stop-opacity', 1);
+    });
+
+    nodeSel.filter(d => d._type === 'circuit').append('circle')
+      .attr('r', nodeR)
+      .attr('fill', d => `url(#grad-${d.id.replace(/[^a-z0-9]/gi, '')})`)
+      .attr('filter', d => d._isDominant ? 'url(#glow-lg)' : 'url(#glow-sm)');
+
+    // Entry sub-node circle (smaller, flat)
+    nodeSel.filter(d => d._type === 'entry').append('circle')
       .attr('r', nodeR)
       .attr('fill', d => d._color)
-      .attr('fill-opacity', 0.9)
-      .attr('filter', d => getFilter(d));
+      .attr('fill-opacity', 0.82)
+      .attr('filter', 'url(#glow-sm)');
 
-    // Label (circuits only)
-    nodeSel.filter(d => d._type === 'circuit')
-      .append('text')
+    // ── Label ────────────────────────────────────────────────────────────────
+    // Circuit label BELOW node
+    nodeSel.filter(d => d._type === 'circuit').append('text')
       .text(d => d._label)
       .attr('text-anchor', 'middle')
-      .attr('dominant-baseline', 'middle')
-      .attr('y', d => nodeR(d) + 16)
+      .attr('dy', d => nodeR(d) + 16)
       .attr('fill', '#fff')
-      .attr('font-size', d => d._isDominant ? '10px' : '9px')
-      .attr('font-weight', d => d._isDominant ? 800 : 500)
+      .attr('font-size', d => d._isDominant ? '9.5px' : '8.5px')
+      .attr('font-weight', d => d._isDominant ? 800 : 600)
       .attr('font-family', 'Inter, sans-serif')
-      .attr('letter-spacing', '0.04em')
+      .attr('letter-spacing', '0.05em')
       .attr('opacity', 0.85)
-      .attr('text-transform', 'uppercase')
       .style('pointer-events', 'none')
       .style('text-transform', 'uppercase');
 
-    // Events
+    // Sub-entry label (small, beside node)
+    nodeSel.filter(d => d._type === 'entry').append('text')
+      .text(d => d._label.length > 24 ? d._label.slice(0, 22) + '…' : d._label)
+      .attr('text-anchor', 'start')
+      .attr('dy', '0.35em')
+      .attr('dx', d => nodeR(d) + 7)
+      .attr('fill', '#fff')
+      .attr('font-size', '7.5px')
+      .attr('font-weight', 500)
+      .attr('font-family', 'Inter, sans-serif')
+      .attr('opacity', 0.7)
+      .style('pointer-events', 'none');
+
+    // ── Sub-node count badge (shown on circuit nodes when collapsed) ─────────
+    nodeSel.filter(d => d._type === 'circuit' && d._count > 0).append('circle')
+      .attr('cx', d => nodeR(d) - 3)
+      .attr('cy', d => -(nodeR(d) - 3))
+      .attr('r', 8)
+      .attr('fill', d => d._color)
+      .attr('stroke', '#06060a')
+      .attr('stroke-width', 1.5);
+
+    nodeSel.filter(d => d._type === 'circuit' && d._count > 0).append('text')
+      .text(d => d._count)
+      .attr('x', d => nodeR(d) - 3)
+      .attr('y', d => -(nodeR(d) - 3))
+      .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'middle')
+      .attr('fill', '#06060a')
+      .attr('font-size', '7px')
+      .attr('font-weight', 900)
+      .attr('font-family', 'Inter, sans-serif')
+      .style('pointer-events', 'none');
+
+    // ── Expand / collapse arc indicator ─────────────────────────────────────
+    const arcGen = d3.arc()
+      .innerRadius(d => nodeR(d) + 5)
+      .outerRadius(d => nodeR(d) + 8)
+      .startAngle(0)
+      .endAngle(d => d._expanded ? Math.PI * 2 : Math.PI * 0.6);
+
+    nodeSel.filter(d => d._type === 'circuit').append('path')
+      .attr('class', 'expand-arc')
+      .attr('d', arcGen)
+      .attr('fill', d => d._color)
+      .attr('opacity', 0.55)
+      .style('pointer-events', 'none');
+
+    // ── Events ───────────────────────────────────────────────────────────────
     nodeSel
       .on('click', (event, d) => {
+        if (clickLock.current) return;
+        clickLock.current = true;
+        setTimeout(() => (clickLock.current = false), 300);
         event.stopPropagation();
         if (d._type === 'circuit') {
           setExpandedIds(prev => {
@@ -260,151 +341,182 @@ export default function BrainGraph({ data }) {
       .on('mouseenter', (_, d) => setHoveredNode(d))
       .on('mouseleave', () => setHoveredNode(null));
 
-    // Drag (only free/sub nodes)
+    // ── Drag (sub-nodes only, stay near parent hemisphere) ───────────────────
     nodeSel.filter(d => d._type === 'entry').call(
       d3.drag()
         .on('start', (event, d) => { if (!event.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
-        .on('drag', (event, d) => { d.fx = event.x; d.fy = event.y; })
-        .on('end', (event, d) => { if (!event.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
+        .on('drag',  (event, d) => { d.fx = event.x; d.fy = event.y; })
+        .on('end',   (event, d) => { if (!event.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
     );
 
-    // ── Simulation ──────────────────────────────────────────────────────────
+    // ── Simulation ────────────────────────────────────────────────────────────
     const sim = d3.forceSimulation(nodes)
-      .force('link', d3.forceLink(links).id(d => d.id).distance(d => d._type === 'core' ? 120 : 55).strength(d => d._type === 'core' ? 0.1 : 0.8))
-      .force('charge', d3.forceManyBody().strength(d => d._type === 'circuit' ? -20 : -60))
-      .force('center', d3.forceCenter(W / 2, H / 2).strength(0.02))
-      .force('collision', d3.forceCollide().radius(d => nodeR(d) + 20));
+      .force('link',
+        d3.forceLink(links).id(d => d.id)
+          .distance(d => d._type === 'core' ? 130 : 62)
+          .strength(d => d._type === 'core' ? 0.06 : 0.9)
+      )
+      .force('charge', d3.forceManyBody().strength(d => d._type === 'circuit' ? -10 : -80))
+      .force('center', d3.forceCenter(W / 2, H / 2).strength(0.015))
+      .force('collision', d3.forceCollide().radius(d => nodeR(d) + 22));
 
-    // Bounding box: keep sub-nodes inside the brain "canvas"
-    sim.on('tick', () => {
-      nodes.forEach(d => {
-        if (d._type === 'entry') {
-          d.x = Math.max(60, Math.min(W - 60, d.x));
-          d.y = Math.max(60, Math.min(H - 60, d.y));
+    // ── Float animation ───────────────────────────────────────────────────────
+    const animate = (ts) => {
+      // Gently nudge circuit nodes to float (respect their anchored fx/fy)
+      nodes.forEach(n => {
+        if (n._type !== 'circuit') return;
+        const p = getFloat(n.id);
+        const δ = p.amp * Math.sin(ts * p.freq + p.phase);
+        // Temporarily offset from anchor
+        const base = ANCHORS[n.id];
+        if (base) {
+          n.fx = base.cx;
+          n.fy = base.cy + δ;
         }
       });
 
+      // Bounding for sub-nodes
+      nodes.forEach(d => {
+        if (d._type !== 'entry') return;
+        d.x = Math.max(50, Math.min(W - 50, d.x));
+        d.y = Math.max(50, Math.min(H - 50, d.y));
+      });
+
       linkSel
-        .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
-        .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+        .attr('x1', d => d.source.x ?? 0).attr('y1', d => d.source.y ?? 0)
+        .attr('x2', d => d.target.x ?? 0).attr('y2', d => d.target.y ?? 0);
 
       nodeSel.attr('transform', d => `translate(${d.x ?? 0},${d.y ?? 0})`);
-    });
 
-    simRef.current = sim;
+      sim.tick();
+      rafRef.current = requestAnimationFrame(animate);
+    };
 
-    return () => sim.stop();
-  }, [nodes, links]); // ← hover excluded intentionally
+    sim.stop(); // we drive it manually via rAF
+    rafRef.current = requestAnimationFrame(animate);
 
-  // ── Node radius helper ─────────────────────────────────────────────────────
+    return () => {
+      sim.stop();
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [nodes, links]); // hover excluded intentionally
+
   function nodeR(d) {
-    if (d._type === 'entry') return 5 + (d.intensity ?? 3) * 0.6;
-    if (d._isDominant) return 16;
-    return 9;
+    if (d._type === 'entry') return 4.5 + (d.intensity ?? 3) * 0.5;
+    if (d._isDominant) return 17;
+    return 10;
   }
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // ─── Render ────────────────────────────────────────────────────────────────
   return (
-    <section
-      className="neural-card"
-      style={{
-        position: 'relative',
-        width: '100%',
-        height: 520,
-        overflow: 'hidden',
-        borderRadius: '2.5rem',
-        background: '#000',
-      }}
-    >
-      {/* ── Brain Image Background ── */}
-      <img
-        src="/assets/brain_bg.png"
-        alt=""
-        aria-hidden="true"
+    <section style={{
+      position: 'relative', width: '100%', height: 520,
+      overflow: 'hidden', borderRadius: '2.5rem', background: '#000',
+    }}>
+      {/* Brain image */}
+      <img src="/assets/brain_bg.png" alt="" aria-hidden
         style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          objectPosition: 'center',
-          opacity: 0.45,
-          pointerEvents: 'none',
-          userSelect: 'none',
+          position: 'absolute', inset: 0,
+          width: '100%', height: '100%',
+          objectFit: 'cover', objectPosition: 'center',
+          opacity: 0.42, pointerEvents: 'none',
         }}
       />
 
-      {/* ── D3 SVG Canvas ── */}
-      <svg
-        ref={svgRef}
+      {/* D3 SVG */}
+      <svg ref={svgRef}
         viewBox="0 0 900 500"
         preserveAspectRatio="xMidYMid meet"
         style={{ position: 'relative', zIndex: 2, width: '100%', height: '100%', display: 'block' }}
       >
         <defs />
-        {/* Hemisphere zone labels (non-interactive) */}
-        <text x="90" y="470" fill="#60b8ff" fontSize="10" fontWeight="700" opacity="0.5" fontFamily="Inter,sans-serif" textAnchor="middle">TERRESTRE (IZQ.)</text>
-        <text x="760" y="470" fill="#ff6eb4" fontSize="10" fontWeight="700" opacity="0.5" fontFamily="Inter,sans-serif" textAnchor="middle">POST-TERRESTRE (DER.)</text>
-        {/* Subtle centre divider */}
-        <line x1="450" y1="40" x2="450" y2="460" stroke="rgba(255,255,255,0.04)" strokeWidth="1" strokeDasharray="6 8" />
+        <text x="90"  y="476" fill="#60b8ff" fontSize="9" fontWeight="700" opacity="0.45" fontFamily="Inter,sans-serif" textAnchor="middle">◀ TERRESTRE (IZQ.)</text>
+        <text x="795" y="476" fill="#ff6eb4" fontSize="9" fontWeight="700" opacity="0.45" fontFamily="Inter,sans-serif" textAnchor="middle">POST-TERRESTRE (DER.) ▶</text>
+        <line x1="450" y1="30" x2="450" y2="465" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="5 9" />
       </svg>
 
-      {/* ── Balance Analytics Overlay ── */}
+      {/* Analytics overlay */}
       <div style={{
         position: 'absolute', top: '2rem', left: '2rem', right: '2rem',
         display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
         pointerEvents: 'none', zIndex: 5,
       }}>
         <div>
-          <h2 style={{ fontSize: '1rem', fontWeight: 900, letterSpacing: '-0.02em', textTransform: 'uppercase', color: '#fff', marginBottom: 6 }}>
+          <h2 style={{ fontSize: '0.95rem', fontWeight: 900, letterSpacing: '-0.01em', textTransform: 'uppercase', color: '#fff', margin: 0 }}>
             Equilibrio Hemisférico
           </h2>
-          <p style={{ fontSize: '0.65rem', opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-            Predominancia: <span style={{ color: balance.color, fontWeight: 800 }}>{balance.dominant}</span>
+          <p style={{ fontSize: '0.62rem', opacity: 0.5, margin: '5px 0 0', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+            Predomina: <span style={{ color: balance.color, fontWeight: 800 }}>{balance.dominant}</span>
           </p>
-          <div style={{ display: 'flex', height: 3, width: 220, marginTop: 10, borderRadius: 2, overflow: 'hidden' }}>
+          <div style={{ display: 'flex', height: 3, width: 200, marginTop: 10, borderRadius: 2, overflow: 'hidden' }}>
             <div style={{ width: `${balance.left}%`, background: '#60b8ff', transition: 'width 0.8s ease' }} />
-            <div style={{ flex: 1, background: '#ff6eb4', transition: 'width 0.8s ease' }} />
+            <div style={{ flex: 1, background: '#ff6eb4' }} />
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', width: 220, marginTop: 6 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', width: 200, marginTop: 5 }}>
             <span style={{ fontSize: '0.6rem', color: '#60b8ff', fontWeight: 800 }}>{balance.left}% IZQ</span>
             <span style={{ fontSize: '0.6rem', color: '#ff6eb4', fontWeight: 800 }}>{balance.right}% DER</span>
           </div>
         </div>
-
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: '2rem', fontWeight: 900, color: balance.color, lineHeight: 1 }}>
+          <div style={{ fontSize: '1.9rem', fontWeight: 900, color: balance.color, lineHeight: 1 }}>
             {Math.max(balance.left, balance.right)}%
           </div>
-          <div style={{ fontSize: '0.6rem', opacity: 0.4, letterSpacing: '0.08em', marginTop: 4 }}>AFINIDAD</div>
+          <div style={{ fontSize: '0.55rem', opacity: 0.35, letterSpacing: '0.09em', marginTop: 3 }}>
+            AFINIDAD
+          </div>
         </div>
       </div>
 
-      {/* ── Hover Tooltip ── */}
+      {/* Legend */}
+      <div style={{
+        position: 'absolute', bottom: '2rem', left: '2rem',
+        display: 'flex', gap: 14, alignItems: 'center',
+        pointerEvents: 'none', zIndex: 5,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#fff', opacity: 0.5 }} />
+          <span style={{ fontSize: '0.58rem', opacity: 0.35, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Toca para expandir</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#60b8ff' }} />
+          <span style={{ fontSize: '0.58rem', opacity: 0.35, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Número = hilos</span>
+        </div>
+      </div>
+
+      {/* Hover tooltip */}
       {hoveredNode && (
-        <div
-          className="animate-fade-in"
-          style={{
-            position: 'absolute',
-            bottom: '2rem', left: '2rem', right: '2rem',
-            padding: '1rem 1.25rem',
-            background: 'rgba(4,4,4,0.82)',
-            backdropFilter: 'blur(30px)',
-            borderRadius: '1.25rem',
-            border: `1px solid ${hoveredNode._color}33`,
-            zIndex: 10,
-            pointerEvents: 'none',
-          }}
-        >
-          <div style={{ fontWeight: 900, fontSize: '0.8rem', color: hoveredNode._color, textTransform: 'uppercase', marginBottom: 4, display: 'flex', justifyContent: 'space-between' }}>
-            <span>{hoveredNode._label}</span>
-            {hoveredNode._isDominant && (
-              <span style={{ fontSize: '0.6rem', padding: '2px 8px', borderRadius: 4, background: hoveredNode._color, color: '#000', fontWeight: 900 }}>
-                DOMINANTE
-              </span>
-            )}
+        <div className="animate-fade-in" style={{
+          position: 'absolute', bottom: '2.5rem', left: '2rem', right: '2rem',
+          padding: '1rem 1.25rem',
+          background: 'rgba(4,4,4,0.85)',
+          backdropFilter: 'blur(28px)',
+          borderRadius: '1.25rem',
+          border: `1px solid ${hoveredNode._color}28`,
+          zIndex: 10, pointerEvents: 'none',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
+            <span style={{ fontWeight: 900, fontSize: '0.82rem', color: hoveredNode._color, textTransform: 'uppercase' }}>
+              {hoveredNode._label}
+            </span>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {hoveredNode._count > 0 && (
+                <span style={{ fontSize: '0.62rem', padding: '2px 8px', borderRadius: 4, background: `${hoveredNode._color}22`, color: hoveredNode._color, fontWeight: 700 }}>
+                  {hoveredNode._count} hilos
+                </span>
+              )}
+              {hoveredNode._isDominant && (
+                <span style={{ fontSize: '0.62rem', padding: '2px 8px', borderRadius: 4, background: hoveredNode._color, color: '#000', fontWeight: 900 }}>
+                  DOMINANTE
+                </span>
+              )}
+              {hoveredNode._expanded && (
+                <span style={{ fontSize: '0.62rem', padding: '2px 8px', borderRadius: 4, background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 700 }}>
+                  EXPANDIDO
+                </span>
+              )}
+            </div>
           </div>
-          <p style={{ fontSize: '0.72rem', opacity: 0.55, lineHeight: 1.5, margin: 0 }}>
+          <p style={{ fontSize: '0.72rem', opacity: 0.5, lineHeight: 1.55, margin: 0 }}>
             {hoveredNode._type === 'circuit'
               ? (CIRCUIT_DESCRIPTIONS[hoveredNode.id] ?? 'Circuito neuronal activo')
               : 'Hilo de pensamiento — clic para profundizar'}

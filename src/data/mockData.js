@@ -69,9 +69,44 @@ export const graphData = {
 };
 
 export const circuitEntries = {
+  [CIRCUIT_IDS.BIO_SURVIVAL]: [
+    { id: 'bs1', text: 'Necesidad de seguridad económica', intensity: 9 },
+    { id: 'bs2', text: 'Rutina de alimentación alterada', intensity: 7 },
+    { id: 'bs3', text: 'Respuesta de huida ante conflicto', intensity: 8 },
+  ],
+  [CIRCUIT_IDS.EMOTIONAL]: [
+    { id: 'em1', text: 'Tensión con figura de autoridad', intensity: 7 },
+    { id: 'em2', text: 'Defensa de espacio personal', intensity: 6 },
+    { id: 'em3', text: 'Búsqueda de validación social', intensity: 8 },
+    { id: 'em4', text: 'Jerarquía en grupo de trabajo', intensity: 5 },
+  ],
   [CIRCUIT_IDS.SYMBOLIC]: [
     { id: 's1', text: 'Reflexión lógica de medianoche', intensity: 8 },
     { id: 's2', text: 'Análisis de patrones de sueño', intensity: 6 },
+    { id: 's3', text: 'Construcción de argumento mental', intensity: 9 },
+  ],
+  [CIRCUIT_IDS.SOCIO_SEXUAL]: [
+    { id: 'ss1', text: 'Dilema moral ante decisión laboral', intensity: 6 },
+    { id: 'ss2', text: 'Normas de comportamiento social', intensity: 4 },
+  ],
+  [CIRCUIT_IDS.NEUROSOMATIC]: [
+    { id: 'ns1', text: 'Sensación de flujo durante ejercicio', intensity: 8 },
+    { id: 'ns2', text: 'Estado de calma post-meditación', intensity: 9 },
+    { id: 'ns3', text: 'Euforia creativa inesperada', intensity: 7 },
+    { id: 'ns4', text: 'Dolor físico convertido en conciencia', intensity: 5 },
+  ],
+  [CIRCUIT_IDS.METAPROGRAMMING]: [
+    { id: 'mp1', text: 'Observación de mis propios patrones', intensity: 9 },
+    { id: 'mp2', text: 'Reprogramación de creencia limitante', intensity: 8 },
+  ],
+  [CIRCUIT_IDS.NEUROGENETIC]: [
+    { id: 'ng1', text: 'Sueño con memoria colectiva', intensity: 6 },
+    { id: 'ng2', text: 'Intuición ancestral sobre decisión', intensity: 7 },
+    { id: 'ng3', text: 'Déjà vu de experiencia evolutiva', intensity: 5 },
+  ],
+  [CIRCUIT_IDS.QUANTUM]: [
+    { id: 'q1', text: 'Sincronicidad no explicada', intensity: 9 },
+    { id: 'q2', text: 'Conciencia más allá del cuerpo', intensity: 8 },
   ],
 };
 
