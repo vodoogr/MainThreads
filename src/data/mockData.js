@@ -1,237 +1,197 @@
 // ============================================================
-// Mental Threads — Mock Data Layer
-// Centralized data structures for all screens.
-// Ready to be replaced by API calls later.
+// Mental Threads — Modelo de los 8 Circuitos de la Consciencia
+// Basado en el Teorema de Timothy Leary
 // ============================================================
 
-export const NODE_IDS = {
-  SURVIVAL: 'SURVIVAL',
-  RELATIONSHIPS: 'RELATIONSHIPS',
-  CONTROL: 'CONTROL',
-  OVERTHINKING: 'OVERTHINKING',
-  BODY: 'BODY',
-  CREATIVITY: 'CREATIVITY',
-  PURPOSE: 'PURPOSE',
+export const CIRCUIT_IDS = {
+  BIO_SURVIVAL: 'BIO_SURVIVAL',       // 1. Bio-supervivencia
+  EMOTIONAL: 'EMOTIONAL',             // 2. Emocional-Territorial
+  SYMBOLIC: 'SYMBOLIC',               // 3. Simbólico (Semántico)
+  SOCIO_SEXUAL: 'SOCIO_SEXUAL',       // 4. Socio-Sexual
+  NEUROSOMATIC: 'NEUROSOMATIC',       // 5. Neurosomático
+  METAPROGRAMMING: 'METAPROGRAMMING', // 6. Metaprogramación
+  MORPHOGENETIC: 'MORPHOGENETIC',     // 7. Morfogenético
+  QUANTUM: 'QUANTUM',                 // 8. Cuántico
 };
 
-export const NODE_LABELS = {
-  [NODE_IDS.SURVIVAL]: 'Supervivencia / Seguridad',
-  [NODE_IDS.RELATIONSHIPS]: 'Relaciones',
-  [NODE_IDS.CONTROL]: 'Control / Autoestima',
-  [NODE_IDS.OVERTHINKING]: 'Pensamiento / Sobrecarga',
-  [NODE_IDS.BODY]: 'Cuerpo / Sensaciones',
-  [NODE_IDS.CREATIVITY]: 'Creatividad / Expresión',
-  [NODE_IDS.PURPOSE]: 'Sentido / Propósito',
+export const CIRCUIT_LABELS = {
+  [CIRCUIT_IDS.BIO_SURVIVAL]: 'Bio-supervivencia',
+  [CIRCUIT_IDS.EMOTIONAL]: 'Emocional-Territorial',
+  [CIRCUIT_IDS.SYMBOLIC]: 'Simbólico-Semántico',
+  [CIRCUIT_IDS.SOCIO_SEXUAL]: 'Socio-Sexual',
+  [CIRCUIT_IDS.NEUROSOMATIC]: 'Neurosomático',
+  [CIRCUIT_IDS.METAPROGRAMMING]: 'Metaprogramación',
+  [CIRCUIT_IDS.MORPHOGENETIC]: 'Morfogenético',
+  [CIRCUIT_IDS.QUANTUM]: 'Cuántico-Universal',
 };
 
-export const NODE_COLORS = {
-  [NODE_IDS.SURVIVAL]: '#fa746f',
-  [NODE_IDS.RELATIONSHIPS]: '#d3bcfc',
-  [NODE_IDS.CONTROL]: '#89d4cd',
-  [NODE_IDS.OVERTHINKING]: '#89d4cd',
-  [NODE_IDS.BODY]: '#eacd71',
-  [NODE_IDS.CREATIVITY]: '#ffeaaf',
-  [NODE_IDS.PURPOSE]: '#d3bcfc',
+export const CIRCUIT_DESCRIPTIONS = {
+  [CIRCUIT_IDS.BIO_SURVIVAL]: 'Seguridad biológica elemental. Dicótoma "seguro/peligroso". El cerebro oral.',
+  [CIRCUIT_IDS.EMOTIONAL]: 'Estatus social, poder y defensa del territorio. El cerebro anal.',
+  [CIRCUIT_IDS.SYMBOLIC]: 'Lenguaje, lógica racional y uso de herramientas. El cerebro semántico.',
+  [CIRCUIT_IDS.SOCIO_SEXUAL]: 'Moralidad, normas sociales y personalidad tribal. El cerebro social.',
+  [CIRCUIT_IDS.NEUROSOMATIC]: 'Sensación de placer sensorial intenso y éxtasis corporal. El cuerpo como máquina perfecta.',
+  [CIRCUIT_IDS.METAPROGRAMMING]: 'El cerebro observándose a sí mismo. Reprogramación de la realidad como construcción mental.',
+  [CIRCUIT_IDS.MORPHOGENETIC]: 'Memoria evolutiva y registros genéticos. Acceso al pasado de la especie.',
+  [CIRCUIT_IDS.QUANTUM]: 'Consciencia no-local. Conexión universal que trasciende tiempo y espacio.',
 };
 
-// Future-ready graph data shape
+// Colors associated with each circuit (Gradients from Earthy to Cosmic)
+export const CIRCUIT_COLORS = {
+  [CIRCUIT_IDS.BIO_SURVIVAL]: '#fa746f', // Rojo terra
+  [CIRCUIT_IDS.EMOTIONAL]: '#f9db7d',    // Ambar territorial
+  [CIRCUIT_IDS.SYMBOLIC]: '#89d4cd',     // Verde lógico
+  [CIRCUIT_IDS.SOCIO_SEXUAL]: '#6da5ff', // Azul social
+  [CIRCUIT_IDS.NEUROSOMATIC]: '#ffeaaf', // Oro sensorial
+  [CIRCUIT_IDS.METAPROGRAMMING]: '#d3bcfc', // Violeta conciencia
+  [CIRCUIT_IDS.MORPHOGENETIC]: '#ff9eff', // Magenta genético
+  [CIRCUIT_IDS.QUANTUM]: '#ffffff',      // Blanco cuántico
+};
+
+// Aliases for backward compatibility
+export const NODE_LABELS = CIRCUIT_LABELS;
+export const NODE_COLORS = CIRCUIT_COLORS;
+
+// Conceptual brain mapping for SVG visualization
+// x, y relative to a 400x400 viewBox
+export const circuitNodes = [
+  { id: CIRCUIT_IDS.BIO_SURVIVAL, x: 200, y: 340, intensity: 0.8, region: 'brainstem' },
+  { id: CIRCUIT_IDS.EMOTIONAL, x: 200, y: 240, intensity: 0.6, region: 'limbic' },
+  { id: CIRCUIT_IDS.SYMBOLIC, x: 120, y: 180, intensity: 0.9, region: 'left_cortex' },
+  { id: CIRCUIT_IDS.SOCIO_SEXUAL, x: 280, y: 180, intensity: 0.4, region: 'right_parietal' },
+  { id: CIRCUIT_IDS.NEUROSOMATIC, x: 300, y: 100, intensity: 0.3, region: 'right_sensory' },
+  { id: CIRCUIT_IDS.METAPROGRAMMING, x: 200, y: 60, intensity: 0.5, region: 'prefrontal' },
+  { id: CIRCUIT_IDS.MORPHOGENETIC, x: 100, y: 100, intensity: 0.2, region: 'deep_memory' },
+  { id: CIRCUIT_IDS.QUANTUM, x: 200, y: 140, intensity: 0.15, region: 'thalamus' },
+];
+
 export const graphData = {
-  nodes: [
-    { id: NODE_IDS.SURVIVAL, x: 120, y: 80, intensity: 0.3 },
-    { id: NODE_IDS.RELATIONSHIPS, x: 320, y: 70, intensity: 0.25 },
-    { id: NODE_IDS.CONTROL, x: 100, y: 280, intensity: 0.5 },
-    { id: NODE_IDS.OVERTHINKING, x: 200, y: 180, intensity: 0.85 },
-    { id: NODE_IDS.BODY, x: 350, y: 300, intensity: 0.4 },
-    { id: NODE_IDS.CREATIVITY, x: 360, y: 200, intensity: 0.15 },
-    { id: NODE_IDS.PURPOSE, x: 200, y: 350, intensity: 0.7 },
-  ],
+  nodes: circuitNodes,
   connections: [
-    { source: NODE_IDS.SURVIVAL, target: NODE_IDS.OVERTHINKING, strength: 0.7 },
-    { source: NODE_IDS.OVERTHINKING, target: NODE_IDS.CONTROL, strength: 0.6 },
-    { source: NODE_IDS.OVERTHINKING, target: NODE_IDS.PURPOSE, strength: 0.8 },
-    { source: NODE_IDS.RELATIONSHIPS, target: NODE_IDS.PURPOSE, strength: 0.4 },
-    { source: NODE_IDS.BODY, target: NODE_IDS.CREATIVITY, strength: 0.35 },
+    { source: CIRCUIT_IDS.BIO_SURVIVAL, target: CIRCUIT_IDS.EMOTIONAL, strength: 0.9 },
+    { source: CIRCUIT_IDS.EMOTIONAL, target: CIRCUIT_IDS.SYMBOLIC, strength: 0.7 },
+    { source: CIRCUIT_IDS.SYMBOLIC, target: CIRCUIT_IDS.METAPROGRAMMING, strength: 0.5 },
+    { source: CIRCUIT_IDS.NEUROSOMATIC, target: CIRCUIT_IDS.METAPROGRAMMING, strength: 0.4 },
+    { source: CIRCUIT_IDS.METAPROGRAMMING, target: CIRCUIT_IDS.QUANTUM, strength: 0.8 },
   ],
   threads: [
-    { source: NODE_IDS.SURVIVAL, target: NODE_IDS.BODY, strength: 0.9 },
-    { source: NODE_IDS.OVERTHINKING, target: NODE_IDS.BODY, strength: 0.65 },
+    { source: CIRCUIT_IDS.BIO_SURVIVAL, target: CIRCUIT_IDS.NEUROSOMATIC, strength: 0.6 },
+    { source: CIRCUIT_IDS.SYMBOLIC, target: CIRCUIT_IDS.MORPHOGENETIC, strength: 0.3 },
   ],
 };
 
+// ... (rest of mock data remains same in structure but uses new IDs)
 export const dailySummary = {
-  entriesCount: 4,
-  dominantNode: { id: NODE_IDS.PURPOSE, label: 'Sentido' },
-  averageIntensity: 6.5,
-  recurringThread: 'Proyectos pendientes',
-  date: new Date().toLocaleDateString('es-ES', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  }),
+  entriesCount: 5,
+  dominantNode: { id: CIRCUIT_IDS.SYMBOLIC, label: 'Simbólico-Semántico' },
+  averageIntensity: 7.2,
+  recurringThread: 'Resolución de problemas lógicos',
+  date: new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }),
 };
 
 export const recentThoughts = [
   {
     id: 't1',
-    text: 'Me siento abrumado por la cantidad de decisiones que debo tomar esta semana, pero hay claridad en el fondo.',
-    time: '14:20',
-    intensity: 8,
-    nodeId: NODE_IDS.OVERTHINKING,
-    nodeColor: '#89d4cd',
+    text: 'He pasado el día analizando estructuras de datos y lógica de programación. Mi mente no descansa del análisis.',
+    time: '18:45',
+    intensity: 9,
+    nodeId: CIRCUIT_IDS.SYMBOLIC,
+    nodeColor: CIRCUIT_COLORS[CIRCUIT_IDS.SYMBOLIC],
     date: 'Hoy',
   },
   {
     id: 't2',
-    text: 'Hoy el foco está en las relaciones personales. Una conversación pendiente me ha dado paz.',
-    time: '10:05',
-    intensity: 4,
-    nodeId: NODE_IDS.RELATIONSHIPS,
-    nodeColor: '#d3bcfc',
+    text: 'Preocupación por la seguridad financiera a largo plazo. Una sensación de alerta constante.',
+    time: '12:20',
+    intensity: 8,
+    nodeId: CIRCUIT_IDS.BIO_SURVIVAL,
+    nodeColor: CIRCUIT_COLORS[CIRCUIT_IDS.BIO_SURVIVAL],
     date: 'Hoy',
   },
   {
     id: 't3',
-    text: 'Cansancio físico notable. Necesito desconectar de las pantallas por unas horas.',
-    time: '21:30',
-    intensity: 3,
-    nodeId: NODE_IDS.BODY,
-    nodeColor: '#484848',
-    date: 'Ayer',
-  },
-  {
-    id: 't4',
-    text: 'He tenido una idea creativa sobre el proyecto que llevo meses bloqueado. Todo encaja de pronto.',
-    time: '16:45',
-    intensity: 7,
-    nodeId: NODE_IDS.CREATIVITY,
-    nodeColor: '#ffeaaf',
+    text: 'Dándome cuenta de mis propios sesgos hoy. Observar el pensamiento es liberador.',
+    time: '21:05',
+    intensity: 5,
+    nodeId: CIRCUIT_IDS.METAPROGRAMMING,
+    nodeColor: CIRCUIT_COLORS[CIRCUIT_IDS.METAPROGRAMMING],
     date: 'Ayer',
   },
 ];
 
+// Node Detail (using Circuit 3 as example)
 export const nodeDetail = {
-  id: NODE_IDS.OVERTHINKING,
-  title: 'Pensamiento / Sobrecarga',
-  description:
-    'Tus procesos mentales activos y carga cognitiva. Este nodo representa la acumulación de tareas pendientes y la fragmentación de la atención durante las últimas jornadas.',
-  activationLevel: 84,
+  id: CIRCUIT_IDS.SYMBOLIC,
+  title: CIRCUIT_LABELS[CIRCUIT_IDS.SYMBOLIC],
+  description: CIRCUIT_DESCRIPTIONS[CIRCUIT_IDS.SYMBOLIC],
+  activationLevel: 92,
   frequency: 'Alta',
-  frequencyDetail: 'Detectado en 12 de los últimos 14 días.',
-  trendData: [40, 60, 85, 95, 75, 50, 30, 65, 90, 45],
+  frequencyDetail: 'Detectado en patrones de resolución lógica complejos.',
+  trendData: [30, 45, 70, 85, 95, 80, 65, 90, 88, 92],
   connections: [
-    { id: 'ansiedad', label: 'Ansiedad', strength: 0.82, color: '#d3bcfc' },
-    { id: 'creatividad', label: 'Creatividad', strength: 0.45, color: '#ffeaaf' },
-    { id: 'trabajo', label: 'Trabajo', strength: 0.91, color: '#484848' },
+    { id: 'logica', label: 'Lógica', strength: 0.95, color: CIRCUIT_COLORS[CIRCUIT_IDS.SYMBOLIC] },
+    { id: 'meta', label: 'Metaprogramación', strength: 0.65, color: CIRCUIT_COLORS[CIRCUIT_IDS.METAPROGRAMMING] },
   ],
   relatedThoughts: [
     {
       id: 'rt1',
-      text: '"Siento que hay demasiados hilos sueltos en el proyecto actual. La cabeza me da vueltas con la entrega de mañana..."',
-      time: 'Hoy, 09:42 AM',
-      borderColor: '#89d4cd',
-    },
-    {
-      id: 'rt2',
-      text: '"Dificultad para desconectar. El ruido mental persiste incluso después de la meditación."',
-      time: 'Ayer, 11:15 PM',
-      borderColor: '#484848',
+      text: '"Análisis exhaustivo de la estructura del sistema neural."',
+      time: 'Hoy, 10:20 AM',
+      borderColor: CIRCUIT_COLORS[CIRCUIT_IDS.SYMBOLIC],
     },
   ],
 };
 
-export const insightData = {
-  weekly: {
-    period: '7 – 13 de Abril',
-    title: 'Síntesis de consciencia',
-    description:
-      'Esta semana has activado principalmente áreas relacionadas con seguridad y presión interna.',
-    highlightWords: [
-      { word: 'seguridad', color: '#89d4cd' },
-      { word: 'presión interna', color: '#d3bcfc' },
-    ],
-    connectionsDetected: 14,
-  },
-  monthly: {
-    month: 'Abril',
-    nodesActivated: 84,
-    summary:
-      'Durante este mes, la arquitectura de tus pensamientos muestra una transición desde la reactividad externa hacia la auto-regulación reflexiva. El foco principal se desplazó de "Carrera Profesional" a "Bienestar Personal".',
-  },
-  threadHealth: {
-    bars: [40, 70, 95, 55, 25],
-    clarityIncrease: 12,
-  },
-  recurringPattern: {
-    title: 'Conexión recurrente',
-    description:
-      'Existe una conexión recurrente entre el pensamiento excesivo y sensaciones corporales reportadas.',
-  },
-  dominantThreads: [
-    { category: 'Crecimiento', label: 'Auto-percepción', color: '#89d4cd' },
-    { category: 'Presión', label: 'Expectativas Externas', color: '#d3bcfc' },
-    { category: 'Calma', label: 'Práctica de Silencio', color: '#ffeaaf' },
-  ],
-};
-
+// Historial Data
 export const historialData = {
   currentMonth: 'Abril',
   currentYear: 2026,
   weekdays: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-  // day numbers with activity levels: 0=none, 1=low, 2=medium, 3=high
   days: [
-    { day: 1, activity: 0 },
-    { day: 2, activity: 0 },
-    { day: 3, activity: 3 },
-    { day: 4, activity: 1 },
-    { day: 5, activity: 3 },
-    { day: 6, activity: 0 },
-    { day: 7, activity: 2 },
-    { day: 8, activity: 0 },
-    { day: 9, activity: 3 },
-    { day: 10, activity: 1 },
-    { day: 11, activity: 2 },
+    { day: 1, activity: 0 }, { day: 2, activity: 0 }, { day: 3, activity: 3 },
     { day: 12, activity: 3 },
   ],
-  startOffset: 1, // Tuesday start = 1 empty cells (Mon)
+  startOffset: 2,
   heatmapBars: [20, 45, 30, 85, 50, 60, 25, 70, 40, 35, 95, 55, 45, 60, 30],
   heatmapMonths: ['Nov', 'Dic', 'Ene', 'Feb', 'Mar', 'Abr'],
   entries: [
     {
       id: 'h1',
-      dayOfWeek: 'Sábado',
+      dayOfWeek: 'Domingo',
       dayNumber: '12',
-      title: 'Claridad Post-Meditación',
-      connectedNodes: 'Ansiedad, Propósito, Calma',
-      dots: ['#89d4cd', 'rgba(137,212,205,0.4)', 'rgba(211,188,252,0.4)'],
-      highlight: false,
-    },
-    {
-      id: 'h2',
-      dayOfWeek: 'Miércoles',
-      dayNumber: '09',
-      title: 'Tensión en el Trabajo',
-      connectedNodes: 'Fatiga, Creatividad, Bloqueo',
-      dots: ['rgba(250,116,111,0.6)', '#484848'],
-      highlight: false,
-    },
-    {
-      id: 'h3',
-      dayOfWeek: 'Lunes',
-      dayNumber: '07',
-      title: 'Epifanía Creativa',
-      connectedNodes: 'Un descubrimiento fundamental sobre la dirección del proyecto.',
-      dots: ['#ffeaaf', 'rgba(255,234,175,0.6)', 'rgba(137,212,205,0.6)'],
+      title: 'Salto Cuántico',
+      connectedNodes: 'Quantum, Meta, Simbólico',
+      dots: [CIRCUIT_COLORS[CIRCUIT_IDS.QUANTUM], CIRCUIT_COLORS[CIRCUIT_IDS.METAPROGRAMMING]],
       highlight: true,
     },
   ],
 };
 
-export const suggestedNodes = [
-  { id: NODE_IDS.SURVIVAL, label: 'Supervivencia / Seguridad' },
-  { id: NODE_IDS.RELATIONSHIPS, label: 'Relaciones' },
-  { id: NODE_IDS.CONTROL, label: 'Control / Autoestima' },
-  { id: NODE_IDS.OVERTHINKING, label: 'Pensamiento / Sobrecarga' },
-  { id: NODE_IDS.BODY, label: 'Cuerpo / Sensaciones' },
-  { id: NODE_IDS.CREATIVITY, label: 'Creatividad / Expresión' },
-  { id: NODE_IDS.PURPOSE, label: 'Sentido / Propósito' },
-];
+// Insight Data
+export const insightData = {
+  weekly: {
+    period: '7 – 13 de Abril',
+    title: 'Expansión de consciencia',
+    description: 'Esta semana has activado principalmente áreas relacionadas con lógica semántica y metaprogramación.',
+    connectionsDetected: 18,
+  },
+  monthly: {
+    month: 'Abril',
+    nodesActivated: 8,
+    summary: 'Tu arquitectura mental muestra una clara tendencia hacia la racionalización y la auto-observación.',
+  },
+  threadHealth: {
+    bars: [40, 70, 95, 55, 25],
+    clarityIncrease: 15,
+  },
+  recurringPattern: {
+    title: 'Iteración Lógica',
+    description: 'Conexión recurrente entre el circuito simbólico y la metaprogramación.',
+  },
+  dominantThreads: [
+    { category: 'Terrestre', label: 'Pensamiento Lógico', color: CIRCUIT_COLORS[CIRCUIT_IDS.SYMBOLIC] },
+    { category: 'Post-Terrestre', label: 'Auto-Observación', color: CIRCUIT_COLORS[CIRCUIT_IDS.METAPROGRAMMING] },
+  ],
+};
+
+export const suggestedNodes = Object.entries(CIRCUIT_LABELS).map(([id, label]) => ({ id, label }));

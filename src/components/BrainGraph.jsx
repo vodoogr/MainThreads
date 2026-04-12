@@ -1,262 +1,201 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { graphData, NODE_LABELS, NODE_COLORS } from '../data/mockData';
+import { graphData, CIRCUIT_LABELS, CIRCUIT_COLORS, CIRCUIT_DESCRIPTIONS } from '../data/mockData';
 
 /**
- * BrainGraph
+ * BrainGraph (Teoría de los 8 Circuitos)
  * 
- * Interactive Neural Graph component.
- * Features:
- * - Responsive SVG scaling
- * - Hover interactions to highlight node relationships
- * - Premium glow effects and pulsating animations
- * - Direct navigation to node details on click
- * - Visual distinction between standard connections and "warm threads"
+ * Visualizes the 8 Circuits of Consciousness within a stylized brain silhouette.
+ * Displays real-time activity levels and highlights the most active "cerebro".
  */
 
 export default function BrainGraph() {
   const navigate = useNavigate();
-  const [hoveredNode, setHoveredNode] = useState(null);
+  const [hoveredCircuit, setHoveredCircuit] = useState(null);
   
-  // Viewbox size (internal coordinate system)
   const vbWidth = 400;
-  const vbHeight = 400;
+  const vbHeight = 440;
 
-  // Process data for easier rendering
-  const { nodes, connections, threads } = useMemo(() => {
+  const { nodes, connections, threads, maxIntensityNode } = useMemo(() => {
+    const nodes = graphData.nodes;
+    const max = nodes.reduce((prev, current) => (prev.intensity > current.intensity) ? prev : current);
+    
     return {
-      nodes: graphData.nodes,
+      nodes,
+      maxIntensityNode: max,
       connections: graphData.connections.map(c => ({
         ...c,
-        sourceNode: graphData.nodes.find(n => n.id === c.source),
-        targetNode: graphData.nodes.find(n => n.id === c.target)
+        sourceNode: nodes.find(n => n.id === c.source),
+        targetNode: nodes.find(n => n.id === c.target)
       })).filter(c => c.sourceNode && c.targetNode),
       threads: graphData.threads.map(t => ({
         ...t,
-        sourceNode: graphData.nodes.find(n => n.id === t.source),
-        targetNode: graphData.nodes.find(n => n.id === t.target)
+        sourceNode: nodes.find(n => n.id === t.source),
+        targetNode: nodes.find(n => n.id === t.target)
       })).filter(t => t.sourceNode && t.targetNode)
     };
   }, []);
 
-  const handleNodeClick = (nodeId) => {
-    // In a real app, we'd pass the nodeId as a param
-    // For now, we navigate to the single detail page we have
-    navigate('/detalle_de_nodo');
-  };
-
-  const isRelated = (nodeId) => {
-    if (!hoveredNode) return false;
-    if (hoveredNode === nodeId) return true;
-    return connections.some(c => 
-      (c.source === hoveredNode && c.target === nodeId) || 
-      (c.target === hoveredNode && c.source === nodeId)
-    ) || threads.some(t => 
-      (t.source === hoveredNode && t.target === nodeId) || 
-      (t.target === hoveredNode && t.source === nodeId)
-    );
+  const isRelated = (id) => {
+    if (!hoveredCircuit) return false;
+    if (hoveredCircuit === id) return true;
+    return connections.some(c => (c.source === hoveredCircuit && c.target === id) || (c.target === hoveredCircuit && c.source === id));
   };
 
   return (
-    <section className="neural-card" style={{ height: 440, width: '100%', position: 'relative' }}>
-      {/* Background layer */}
+    <section className="neural-card" style={{ height: 480, width: '100%', position: 'relative' }}>
+      {/* Glow Layer */}
       <div 
         style={{ 
           position: 'absolute', 
           inset: 0, 
-          opacity: 0.2,
-          background: 'radial-gradient(circle at center, var(--primary-container) 0%, transparent 80%)',
-          pointerEvents: 'none'
+          opacity: 0.15,
+          background: `radial-gradient(circle at ${maxIntensityNode.x/4}% ${maxIntensityNode.y/4.4}%, ${CIRCUIT_COLORS[maxIntensityNode.id]} 0%, transparent 60%)`,
+          transition: 'background 0.8s ease'
         }} 
       />
 
-      {/* Main SVG Graph */}
-      <svg 
-        viewBox={`0 0 ${vbWidth} ${vbHeight}`} 
-        className="animate-breathe"
-        style={{ width: '100%', height: '100%', display: 'block' }}
-      >
+      <svg viewBox={`0 0 ${vbWidth} ${vbHeight}`} style={{ width: '100%', height: '100%' }}>
         <defs>
-          <filter id="glow-filter" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="blur" />
+          <filter id="brain-glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="5" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
-          
-          <radialGradient id="grad-active" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
-          </radialGradient>
-
-          <linearGradient id="warm-thread-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="var(--tertiary)" stopOpacity="0" />
-            <stop offset="50%" stopColor="var(--tertiary)" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="var(--tertiary)" stopOpacity="0" />
-          </linearGradient>
         </defs>
 
-        {/* ── Connection Layer ──────────────────────────────── */}
-        <g id="connections-layer">
-          {connections.map((conn, i) => {
-            const isActive = hoveredNode ? (conn.source === hoveredNode || conn.target === hoveredNode) : true;
-            return (
-              <path
-                key={`conn-${i}`}
-                d={`M${conn.sourceNode.x},${conn.sourceNode.y} Q${(conn.sourceNode.x + conn.targetNode.x) / 2 + 20},${(conn.sourceNode.y + conn.targetNode.y) / 2 - 20} ${conn.targetNode.x},${conn.targetNode.y}`}
-                fill="none"
-                stroke="var(--primary)"
-                strokeWidth={conn.strength * 2}
-                opacity={isActive ? (hoveredNode ? 0.6 : 0.2) : 0.05}
-                style={{ transition: 'opacity 0.4s ease' }}
-              />
-            );
-          })}
+        {/* ── Premium Brain Silhouette ─────────────────────── */}
+        <g id="brain-silhouette" className="animate-breathe" style={{ opacity: 0.12 }}>
+          {/* Main brain mass */}
+          <path
+            d="M200,40 C140,40 100,50 80,100 C60,150 60,200 85,250 C110,300 160,320 200,340 C240,320 290,300 315,250 C340,200 340,150 320,100 C300,50 260,40 200,40 Z"
+            fill="none" stroke="var(--primary)" strokeWidth="1.5"
+          />
+          {/* Internal Sulci/Folds */}
+          <path d="M200,40 L200,340" stroke="var(--primary)" strokeWidth="0.5" strokeDasharray="4 4" />
+          <path d="M140,80 Q170,90 200,85" stroke="var(--primary)" strokeWidth="0.5" fill="none" opacity="0.4" />
+          <path d="M260,80 Q230,90 200,85" stroke="var(--primary)" strokeWidth="0.5" fill="none" opacity="0.4" />
+          <path d="M100,160 Q150,180 200,170" stroke="var(--primary)" strokeWidth="0.5" fill="none" opacity="0.4" />
+          <path d="M300,160 Q250,180 200,170" stroke="var(--primary)" strokeWidth="0.5" fill="none" opacity="0.4" />
+          <path d="M140,260 Q170,280 200,270" stroke="var(--primary)" strokeWidth="0.5" fill="none" opacity="0.4" />
+          <path d="M260,260 Q230,280 200,270" stroke="var(--primary)" strokeWidth="0.5" fill="none" opacity="0.4" />
+          
+          {/* Cerebellum / Brainstem area */}
+          <path d="M180,340 L170,400 L230,400 L220,340" fill="none" stroke="var(--primary)" strokeWidth="1" opacity="0.5" />
+          <path d="M170,360 Q200,370 230,360" stroke="var(--primary)" strokeWidth="0.5" fill="none" opacity="0.3" />
         </g>
 
-        {/* ── Threads Layer (Warm connectors) ────────────────── */}
-        <g id="threads-layer">
-          {threads.map((thread, i) => {
-            const isActive = hoveredNode ? (thread.source === hoveredNode || thread.target === hoveredNode) : true;
-            return (
-              <path
-                key={`thread-${i}`}
-                className="path-well-worn"
-                d={`M${thread.sourceNode.x},${thread.sourceNode.y} C${thread.sourceNode.x + 40},${thread.sourceNode.y + 20} ${thread.targetNode.x - 40},${thread.targetNode.y - 20} ${thread.targetNode.x},${thread.targetNode.y}`}
-                fill="none"
-                stroke="url(#warm-thread-grad)"
-                strokeWidth={thread.strength * 3}
-                opacity={isActive ? 0.4 : 0.05}
-                strokeDasharray="10"
+        {/* ── Connections Layer ─────────────────────────────── */}
+        <g id="connections">
+          {connections.map((c, i) => (
+            <line
+              key={i}
+              x1={c.sourceNode.x} y1={c.sourceNode.y}
+              x2={c.targetNode.x} y2={c.targetNode.y}
+              stroke={CIRCUIT_COLORS[c.source]}
+              strokeWidth={c.strength * 2}
+              opacity={hoveredCircuit ? (isRelated(c.source) && isRelated(c.target) ? 0.4 : 0.05) : 0.1}
+              style={{ transition: 'opacity 0.4s' }}
+            />
+          ))}
+        </g>
+
+        {/* ── Threads Layer ─────────────────────────────────── */}
+        <g id="threads">
+          {threads.map((t, i) => (
+            <path
+              key={i}
+              d={`M${t.sourceNode.x},${t.sourceNode.y} Q${(t.sourceNode.x + t.targetNode.x)/2 + 30},${(t.sourceNode.y + t.targetNode.y)/2} ${t.targetNode.x},${t.targetNode.y}`}
+              fill="none"
+              stroke="var(--tertiary)"
+              strokeWidth="2"
+              opacity="0.2"
+              strokeDasharray="4,4"
+            />
+          ))}
+        </g>
+
+        {/* ── Circuits Layer ────────────────────────────────── */}
+        {nodes.map((node) => {
+          const isMax = node.id === maxIntensityNode.id;
+          const isHovered = hoveredCircuit === node.id;
+          const active = hoveredCircuit ? isRelated(node.id) : true;
+          const color = CIRCUIT_COLORS[node.id];
+          const radius = 8 + (node.intensity * 12);
+
+          return (
+            <g 
+              key={node.id} 
+              onMouseEnter={() => setHoveredCircuit(node.id)}
+              onMouseLeave={() => setHoveredCircuit(null)}
+              onClick={() => navigate('/detalle_de_nodo')}
+              style={{ cursor: 'pointer' }}
+            >
+              {/* Region Indicator (Conceptual) */}
+              <circle
+                cx={node.x} cy={node.y}
+                r={radius * 2}
+                fill={color}
+                opacity={isHovered ? 0.2 : (isMax ? 0.1 : 0)}
+                className={isMax ? "animate-pulse-slow" : ""}
+              />
+
+              {/* Node Core */}
+              <circle
+                cx={node.x} cy={node.y}
+                r={radius}
+                fill={color}
+                opacity={active ? 0.8 : 0.1}
                 style={{ 
-                  animation: 'dash-line 20s linear infinite',
-                  transition: 'opacity 0.4s ease'
+                  filter: isHovered || isMax ? 'url(#brain-glow)' : 'none',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                 }}
               />
-            );
-          })}
-        </g>
 
-        {/* ── Node Layer ────────────────────────────────────── */}
-        <g id="nodes-layer">
-          {nodes.map((node) => {
-            const active = isRelated(node.id);
-            const isHovered = hoveredNode === node.id;
-            const size = (node.intensity * 20) + 10;
-            const label = NODE_LABELS[node.id]?.split(' / ')[0] || node.id;
-            const color = NODE_COLORS[node.id] || 'var(--primary)';
-
-            return (
-              <g 
-                key={node.id}
-                onMouseEnter={() => setHoveredNode(node.id)}
-                onMouseLeave={() => setHoveredNode(null)}
-                onClick={() => handleNodeClick(node.id)}
-                style={{ cursor: 'pointer', transition: 'all 0.4s ease' }}
+              {/* Labelling */}
+              <text
+                x={node.x} y={node.y + radius + 15}
+                textAnchor="middle"
+                className="label-xxs"
+                style={{
+                  fill: active ? 'var(--on-surface)' : 'var(--outline-variant)',
+                  fontSize: isHovered ? '9px' : '7.5px',
+                  opacity: active ? 1 : 0.3,
+                  transition: 'all 0.3s'
+                }}
               >
-                {/* Visual pulse for high intensity nodes */}
-                {node.intensity > 0.6 && (
-                  <circle
-                    cx={node.x}
-                    cy={node.y}
-                    r={size + 15}
-                    fill={color}
-                    opacity={active ? 0.1 : 0}
-                    style={{ transition: 'opacity 0.4s' }}
-                    className="animate-pulse-slow"
-                  />
-                )}
-
-                {/* Node Main Dot */}
-                <circle
-                  cx={node.x}
-                  cy={node.y}
-                  r={isHovered ? size * 1.5 : size}
-                  fill={color}
-                  opacity={hoveredNode ? (active ? 0.9 : 0.2) : (node.intensity + 0.2)}
-                  style={{ 
-                    filter: isHovered ? 'url(#glow-filter)' : 'none',
-                    transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-                  }}
-                />
-
-                {/* Satellite small dots for "neural" feel */}
-                {[0, 120, 240].map((angle, j) => {
-                  const rad = (angle * Math.PI) / 180;
-                  const dist = size + 5;
-                  return (
-                    <circle
-                      key={j}
-                      cx={node.x + Math.cos(rad) * dist}
-                      cy={node.y + Math.sin(rad) * dist}
-                      r={1.5}
-                      fill={color}
-                      opacity={active ? 0.4 : 0}
-                      className="animate-flicker"
-                      style={{ animationDelay: `${j * 0.5}s` }}
-                    />
-                  );
-                })}
-
-                {/* Node Label */}
-                <text
-                  x={node.x}
-                  y={node.y + size + 20}
-                  textAnchor="middle"
-                  className="label-xxs"
-                  style={{
-                    fill: active ? color : 'var(--on-surface-variant)',
-                    opacity: hoveredNode ? (active ? 1 : 0.3) : 0.6,
-                    fontWeight: active ? 700 : 400,
-                    fontSize: '8px',
-                    pointerEvents: 'none',
-                    transition: 'all 0.3s'
-                  }}
-                >
-                  {label}
-                </text>
-              </g>
-            );
-          })}
-        </g>
+                {CIRCUIT_LABELS[node.id]}
+              </text>
+            </g>
+          );
+        })}
       </svg>
 
-      {/* Static Overlay UI */}
+      {/* Overlay: Active Info */}
       <div 
         style={{ 
           position: 'absolute', 
           top: '2rem', 
-          left: '2rem', 
-          pointerEvents: 'none' 
+          left: '2rem',
+          maxWidth: '50%'
         }}
       >
-        <h2 
-          style={{ 
-            fontSize: '1.375rem', 
-            fontWeight: 300, 
-            letterSpacing: '-0.02em', 
-            color: 'var(--on-surface)' 
-          }}
-        >
-          Mapa Consciente
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+          <div className="animate-flicker" style={{ width: 8, height: 8, borderRadius: '50%', background: CIRCUIT_COLORS[maxIntensityNode.id], boxShadow: `0 0 10px ${CIRCUIT_COLORS[maxIntensityNode.id]}` }} />
+          <span className="label-xs" style={{ color: CIRCUIT_COLORS[maxIntensityNode.id] }}>Circuito Dominante</span>
+        </div>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.02em' }}>
+          {CIRCUIT_LABELS[maxIntensityNode.id]}
         </h2>
-        <p style={{ fontSize: '0.75rem', color: 'rgba(172,171,170,0.7)', marginTop: 4 }}>
-          Explora las conexiones de tu mente
+        <p style={{ fontSize: '0.75rem', color: 'var(--on-surface-variant)', marginTop: 8, lineHeight: 1.5 }}>
+          {hoveredCircuit ? CIRCUIT_DESCRIPTIONS[hoveredCircuit] : CIRCUIT_DESCRIPTIONS[maxIntensityNode.id]}
         </p>
       </div>
 
-      {/* Legend / Hover Info */}
-      <div 
-        style={{ 
-          position: 'absolute', 
-          bottom: '2rem', 
-          right: '2rem',
-          textAlign: 'right',
-          opacity: hoveredNode ? 1 : 0,
-          transition: 'opacity 0.3s'
-        }}
-      >
-        <span className="label-xs" style={{ color: 'var(--primary)' }}>Hilo Seleccionado</span>
-        <div style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--on-surface)' }}>
-          {hoveredNode && NODE_LABELS[hoveredNode]}
+      {/* Stats Corner */}
+      <div style={{ position: 'absolute', bottom: '2rem', left: '2rem' }}>
+        <div className="label-xs" style={{ opacity: 0.4, marginBottom: 4 }}>Estado Neural</div>
+        <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary)' }}>
+          {maxIntensityNode.region === 'brainstem' ? 'Cerebro Terrestre Activo' : 'Cerebro Post-Terrestre Activo'}
         </div>
       </div>
     </section>
