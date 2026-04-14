@@ -8,6 +8,7 @@ import {
   graphData as fallbackData,
 } from '../data/mockData';
 import { useNeuralStore } from '../store/neuralStore';
+import NeuralAura from './NeuralAura';
 
 // ─── Intuitive Spanish Labels ───────────────────────────────────────────────
 const DISPLAY_LABELS = {
@@ -53,7 +54,8 @@ export default function BrainGraph({ data }) {
     entries: storeEntries, 
     loading, 
     fetchCircuits, 
-    fetchEntries 
+    fetchEntries,
+    currentHrv
   } = useNeuralStore();
 
   useEffect(() => {
@@ -310,16 +312,24 @@ export default function BrainGraph({ data }) {
         </div>
       )}
       
-      {/* Background Brain (Living Evolution) */}
+      {/* Background Evolution Layer (NeuralAura) */}
+      <NeuralAura 
+        balance={balance} 
+        hrv={currentHrv} 
+        totalEntries={Object.values(entriesToUse).flat().length} 
+      />
+
       <img 
         src="/assets/brain_bg.png" 
         style={{ 
           position: 'absolute', inset: 0, width: '100%', height: '100%', 
           objectFit: 'cover', 
-          opacity: avatarVisuals.opacity, 
+          opacity: 0.15, // Fixed low opacity to work with Aura
           filter: `brightness(${avatarVisuals.brightness}) saturate(${avatarVisuals.saturation}) blur(${avatarVisuals.blur}px)`,
+          mixBlendMode: 'overlay', // Blend with Aura
           pointerEvents: 'none',
-          transition: 'all 2.5s cubic-bezier(0.4, 0, 0.2, 1)' 
+          transition: 'all 2.5s cubic-bezier(0.4, 0, 0.2, 1)',
+          zIndex: 1
         }} 
       />
 

@@ -8,6 +8,7 @@ import DetalleDeNodo from './pages/DetalleDeNodo';
 import Historial from './pages/Historial';
 import PerspectivasInsights from './pages/PerspectivasInsights';
 import EthericSlate from './pages/EthericSlate';
+import VincularReloj from './pages/VincularReloj';
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/historial" element={<Historial />} />
         <Route path="/perspectivas_insights" element={<PerspectivasInsights />} />
         <Route path="/etheric_slate" element={<EthericSlate />} />
+        <Route path="/vincular_reloj" element={<VincularReloj />} />
       </Routes>
       <BottomNav />
     </BrowserRouter>

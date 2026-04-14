@@ -53,7 +53,7 @@ export default function InicioSistemaNeuralVivo() {
     <ScreenContainer>
       {/* Huawei Watch Sync Indicator */}
       <div 
-        onClick={syncWatch}
+        onClick={() => navigate('/vincular_reloj')}
         className="card-low"
         style={{
           position: 'fixed',
