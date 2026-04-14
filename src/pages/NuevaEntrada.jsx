@@ -1,15 +1,52 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ScreenContainer from '../components/ScreenContainer';
 import NodeChip from '../components/NodeChip';
-import { suggestedNodes } from '../data/mockData';
+import { useNeuralStore } from '../store/neuralStore';
+
+// ── Keyword Suggestions ─────────────────────────────────────────────────────
+const CIRCUIT_KEYWORDS = {
+  BIO_SURVIVAL: ['hambre', 'comida', 'salud', 'dinero', 'casa', 'seguridad', 'miedo', 'peligro', 'cuerpo', 'instinto', 'sobrevivir', 'médico', 'alquiler', 'factura', 'dormir', 'insomnio', 'dolor', 'frío', 'calor', 'amenaza'],
+  EMOTIONAL: ['enfado', 'rabia', 'poder', 'estatus', 'orgullo', 'pelea', 'dominancia', 'familia', 'equipo', 'territorio', 'liderazgo', 'celos', 'llorar', 'triste', 'emoción', 'mamá', 'papá', 'hermano', 'jefe', 'discusión'],
+  SYMBOLIC: ['lógica', 'plan', 'duda', 'entender', 'idea', 'aprender', 'datos', 'cálculo', 'explicar', 'racional', 'números', 'análisis', 'preocupación', 'sobrecarga', 'estrés', 'trabajo', 'estudiar', 'pensar', 'mente', 'confusión'],
+  SOCIO_SEXUAL: ['amor', 'pareja', 'sexo', 'atracción', 'moral', 'pecado', 'valor', 'amigo', 'vínculo', 'sociedad', 'ética', 'cita', 'conocer', 'soledad', 'cariño', 'novio', 'novia', 'beso', 'social', 'humano'],
+  NEUROSOMATIC: ['placer', 'música', 'arte', 'baile', 'relax', 'masaje', 'yoga', 'respiración', 'éxtasis', 'cuerpo', 'sensación', 'disfrutar', 'comodidad', 'belleza', 'sol', 'naturaleza', 'bienestar'],
+  METAPROGRAMMING: ['cambio', 'hábito', 'creencia', 'reprogramar', 'identidad', 'voluntad', 'ego', 'espejo', 'conciencia', 'decidido', 'transformar', 'evolucionar', 'creer', 'yo', 'mindset'],
+  NEUROGENETIC: ['legado', 'evolución', 'ancestro', 'especie', 'alma', 'patrón', 'historia', 'vida', 'muerte', 'propósito', 'ancestral', 'futuro', 'humanidad', 'genético', 'raíces'],
+  QUANTUM: ['unidad', 'vacío', 'infinito', 'luz', 'trascender', 'silencio', 'conexión', 'nada', 'todo', 'universo', 'paz', 'cuántico', 'meditación', 'cosmos', 'energía', 'vibración']
+};
 
 export default function NuevaEntrada() {
   const navigate = useNavigate();
+  const { circuits, fetchCircuits, addEntry } = useNeuralStore();
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [intensity, setIntensity] = useState(5);
   const [selectedNodes, setSelectedNodes] = useState([]);
+  const [suggestedIds, setSuggestedIds] = useState(new Set());
+
+  useEffect(() => {
+    if (circuits.length === 0) fetchCircuits();
+  }, []);
+
+  // Update suggestions as user types
+  useEffect(() => {
+    const text = (title + ' ' + body).toLowerCase();
+    const matches = new Set();
+    
+    Object.entries(CIRCUIT_KEYWORDS).forEach(([id, keywords]) => {
+      if (keywords.some(kw => text.includes(kw))) {
+        matches.add(id);
+      }
+    });
+
+    setSuggestedIds(matches);
+
+    // Auto-select top suggestion if nothing is selected yet
+    if (selectedNodes.length === 0 && matches.size > 0) {
+      setSelectedNodes([Array.from(matches)[0]]);
+    }
+  }, [title, body]);
 
   const toggleNode = (nodeId) => {
     setSelectedNodes((prev) => {
@@ -19,10 +56,23 @@ export default function NuevaEntrada() {
     });
   };
 
-  const handleSave = () => {
-    // Future: send to backend
-    console.log({ title, body, intensity, selectedNodes });
-    navigate('/inicio_sistema_neural_vivo');
+  const handleSave = async () => {
+    if (!body || selectedNodes.length === 0) {
+      alert('Por favor, escribe un pensamiento y selecciona al menos un nodo.');
+      return;
+    }
+
+    // Use the first selected node as the primary circuit
+    const circuitId = selectedNodes[0];
+    const fullText = title ? `${title}: ${body}` : body;
+    
+    const { error } = await addEntry(circuitId, fullText, intensity);
+    
+    if (error) {
+      alert('Error al guardar: ' + error);
+    } else {
+      navigate('/inicio_sistema_neural_vivo');
+    }
   };
 
   return (
@@ -179,11 +229,12 @@ export default function NuevaEntrada() {
                 Nodos sugeridos (Máx 3)
               </label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                {suggestedNodes.map((node) => (
+                {circuits.map((node) => (
                   <NodeChip
                     key={node.id}
-                    label={node.label}
+                    label={node.nombre}
                     active={selectedNodes.includes(node.id)}
+                    suggested={suggestedIds.has(node.id)}
                     onClick={() => toggleNode(node.id)}
                   />
                 ))}

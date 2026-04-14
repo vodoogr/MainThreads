@@ -5,9 +5,9 @@ import {
   CIRCUIT_IDS,
   CIRCUIT_COLORS,
   CIRCUIT_DESCRIPTIONS,
-  circuitEntries,
   graphData as fallbackData,
 } from '../data/mockData';
+import { useNeuralStore } from '../store/neuralStore';
 
 // ─── Intuitive Spanish Labels ───────────────────────────────────────────────
 const DISPLAY_LABELS = {
@@ -44,20 +44,40 @@ export default function BrainGraph({ data }) {
   const [expandedIds, setExpandedIds]  = useState(new Set());
   const [hoveredNode, setHoveredNode]  = useState(null);
 
+  // ── Zustand Store ─────────────────────────────────────────────────────────
+  const { 
+    circuits: storeCircuits, 
+    entries: storeEntries, 
+    loading, 
+    fetchCircuits, 
+    fetchEntries 
+  } = useNeuralStore();
+
+  useEffect(() => {
+    if (storeCircuits.length === 0) fetchCircuits();
+    if (Object.keys(storeEntries).length === 0) fetchEntries();
+  }, []);
+
+  // Use store data if available, otherwise fallback to mock/props
+  const circuitsToUse = storeCircuits.length > 0 ? storeCircuits : (data?.nodes || fallbackData.nodes);
+  const entriesToUse  = Object.keys(storeEntries).length > 0 ? storeEntries : {};
+
   const graphData = useMemo(() => ({
-    nodes: (data ?? fallbackData).nodes ?? [],
+    nodes: circuitsToUse.map(c => ({
+      id: c.id,
+      intensity: (entriesToUse[c.id] ?? []).reduce((acc, e) => acc + (e.intensity || 5), 0) / (entriesToUse[c.id]?.length || 1)
+    })),
     links: (data ?? fallbackData).links ?? [],
-  }), [data]);
+  }), [circuitsToUse, entriesToUse, data]);
 
   const dominantId = useMemo(() => {
     if (!graphData.nodes.length) return null;
-    // Dominant based on sub-node count
     return graphData.nodes.reduce((a, b) => {
-      const countA = (circuitEntries[a.id] ?? []).length;
-      const countB = (circuitEntries[b.id] ?? []).length;
+      const countA = (entriesToUse[a.id] ?? []).length;
+      const countB = (entriesToUse[b.id] ?? []).length;
       return countA >= countB ? a : b;
     }).id;
-  }, [graphData.nodes]);
+  }, [graphData.nodes, entriesToUse]);
 
   // ── Balance Calculation ───────────────────────────────────────────────────
   const balance = useMemo(() => {
@@ -82,7 +102,7 @@ export default function BrainGraph({ data }) {
       _color:      CIRCUIT_COLORS[n.id] ?? n.color ?? '#fff',
       _isDominant: n.id === dominantId,
       _type:       'circuit',
-      _count:      (circuitEntries[n.id] ?? []).length,
+      _count:      (entriesToUse[n.id] ?? []).length,
       _expanded:   expandedIds.has(n.id),
       x: LEFT_IDS.has(n.id) ? 300 + (Math.random() - 0.5) * 100 : 600 + (Math.random() - 0.5) * 100,
       y: 250 + (Math.random() - 0.5) * 150,
@@ -95,7 +115,7 @@ export default function BrainGraph({ data }) {
     expandedIds.forEach(cid => {
       const parent = allNodes.find(n => n.id === cid);
       if (!parent) return;
-      (circuitEntries[cid] ?? []).forEach(e => {
+      (entriesToUse[cid] ?? []).forEach(e => {
         const sid = `entry-${cid}-${e.id}`;
         allNodes.push({
           id: sid, _label: e.text, _color: parent._color, _type: 'entry', parentId: cid,
@@ -229,6 +249,12 @@ export default function BrainGraph({ data }) {
 
   return (
     <section className="neural-card" style={{ position: 'relative', width: '100%', height: 500, background: '#000', borderRadius: '2rem', overflow: 'hidden' }}>
+      
+      {loading && (
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)' }}>
+          <div style={{ color: 'white', fontSize: '0.8rem', letterSpacing: '0.1em' }}>SINCRONIZANDO NEURONAS...</div>
+        </div>
+      )}
       
       {/* Background Brain (Holographic Side View - Color) */}
       <img 

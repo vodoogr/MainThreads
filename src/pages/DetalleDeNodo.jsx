@@ -1,27 +1,42 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { useMemo, useEffect } from 'react';
+import { useNeuralStore } from '../store/neuralStore';
 import ScreenContainer from '../components/ScreenContainer';
 import { 
-  CIRCUIT_IDS, 
   CIRCUIT_LABELS, 
   CIRCUIT_COLORS, 
-  CIRCUIT_DESCRIPTIONS, 
-  circuitEntries,
-  nodeDetail 
+  CIRCUIT_DESCRIPTIONS,
 } from '../data/mockData';
 
 export default function DetalleDeNodo() {
   const { nodeId } = useParams();
   const navigate = useNavigate();
-  
-  // Guard for invalid nodeId
-  const activeId = nodeId || CIRCUIT_IDS.SYMBOLIC;
-  const label = CIRCUIT_LABELS[activeId] || 'Circuito Desconocido';
-  const color = CIRCUIT_COLORS[activeId] || 'var(--primary)';
-  const description = CIRCUIT_DESCRIPTIONS[activeId] || '';
-  const entries = circuitEntries[activeId] || [];
+  const { circuits, entries: storeEntries, fetchCircuits, fetchEntries, loading } = useNeuralStore();
+
+  useEffect(() => {
+    if (circuits.length === 0) fetchCircuits();
+    if (Object.keys(storeEntries).length === 0) fetchEntries();
+  }, []);
+
+  const circuit = useMemo(() => {
+    return circuits.find(c => c.id === nodeId) || { id: nodeId, nombre: nodeId, color: 'var(--primary)', descripcion: '' };
+  }, [circuits, nodeId]);
+
+  const entries = useMemo(() => {
+    return storeEntries[nodeId] || [];
+  }, [storeEntries, nodeId]);
+
+  const label = circuit.nombre || CIRCUIT_LABELS[nodeId] || 'Circuito Desconocido';
+  const color = circuit.color || CIRCUIT_COLORS[nodeId] || 'var(--primary)';
+  const description = circuit.descripcion || CIRCUIT_DESCRIPTIONS[nodeId] || '';
 
   return (
     <ScreenContainer>
+      {loading && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ color: 'white', letterSpacing: '0.1em' }}>SINCRONIZANDO...</div>
+        </div>
+      )}
       <div className="section-gap" style={{ paddingTop: '2rem' }}>
         {/* Navigation Back */}
         <button 
@@ -90,7 +105,7 @@ export default function DetalleDeNodo() {
               style={{ filter: 'url(#glow-heavy)' }}
             />
             <text x="200" y="155" textAnchor="middle" fill="var(--bg)" style={{ fontSize: 10, fontWeight: 800 }}>
-              {activeId.split('_')[0]}
+              {nodeId.split('_')[0]}
             </text>
 
             {/* Satellite Nodes (The Value Points) */}

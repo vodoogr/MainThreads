@@ -1,18 +1,59 @@
 import { useNavigate } from 'react-router-dom';
+import { useMemo, useEffect } from 'react';
+import { useNeuralStore } from '../store/neuralStore';
 import ScreenContainer from '../components/ScreenContainer';
 import SummaryCard from '../components/SummaryCard';
 import EntryCard from '../components/EntryCard';
 import BrainGraph from '../components/BrainGraph';
-import { dailySummary, recentThoughts, graphData } from '../data/mockData';
 
 export default function InicioSistemaNeuralVivo() {
   const navigate = useNavigate();
+  const { circuits, entries, loading, fetchCircuits, fetchEntries } = useNeuralStore();
+
+  useEffect(() => {
+    fetchCircuits();
+    fetchEntries();
+  }, []);
+
+  // Calculate dynamic summary
+  const stats = useMemo(() => {
+    const allEntries = Object.values(entries).flat();
+    const count = allEntries.length;
+    
+    // Average intensity
+    const avgInt = count > 0 
+      ? Math.round((allEntries.reduce((acc, e) => acc + (e.intensity || 5), 0) / count) * 10) / 10 
+      : 0;
+
+    // Dominant node (max entries)
+    let dominant = { label: 'Calculando...' };
+    if (circuits.length > 0) {
+      const entryKeys = Object.keys(entries);
+      const domId = entryKeys.length > 0 
+        ? entryKeys.reduce((a, b) => (entries[a]?.length || 0) > (entries[b]?.length || 0) ? a : b)
+        : circuits[0].id;
+      
+      const circuit = circuits.find(c => c.id === domId);
+      if (circuit) dominant = { label: circuit.nombre };
+    }
+
+    // Recent thoughts
+    const recent = allEntries
+      .slice(0, 5)
+      .map(e => ({
+        ...e,
+        time: 'Reciente',
+        nodeColor: circuits.find(c => c.id === e.id_circuito)?.color || '#fff'
+      }));
+
+    return { count, avgInt, dominant, recent, recurring: 'Ninguna' };
+  }, [circuits, entries]);
 
   return (
     <ScreenContainer>
       <div className="section-gap" style={{ paddingTop: '2rem' }}>
         {/* Brain Graph Area */}
-        <BrainGraph data={graphData} />
+        <BrainGraph />
 
         {/* Summary Cards Bento Grid */}
         <div
@@ -32,7 +73,7 @@ export default function InicioSistemaNeuralVivo() {
                   lineHeight: 1,
                 }}
               >
-                {String(dailySummary.entriesCount).padStart(2, '0')}
+                {String(stats.count).padStart(2, '0')}
               </span>
               <span
                 style={{
@@ -61,7 +102,7 @@ export default function InicioSistemaNeuralVivo() {
                   color: 'var(--on-surface)',
                 }}
               >
-                {dailySummary.dominantNode.label}
+                {stats.dominant.label}
               </span>
             </div>
           </SummaryCard>
@@ -80,7 +121,7 @@ export default function InicioSistemaNeuralVivo() {
                 <div
                   style={{
                     height: '100%',
-                    width: `${dailySummary.averageIntensity * 10}%`,
+                    width: `${stats.avgInt * 10}%`,
                     background: 'var(--primary)',
                     borderRadius: 'var(--radius-full)',
                     boxShadow: '0 0 10px rgba(137,212,205,0.3)',
@@ -94,7 +135,7 @@ export default function InicioSistemaNeuralVivo() {
                   color: 'var(--primary)',
                 }}
               >
-                {dailySummary.averageIntensity}
+                {stats.avgInt}
               </span>
             </div>
           </SummaryCard>
@@ -116,7 +157,7 @@ export default function InicioSistemaNeuralVivo() {
                   whiteSpace: 'nowrap',
                 }}
               >
-                {dailySummary.recurringThread}
+                {stats.recurring}
               </span>
             </div>
           </SummaryCard>
@@ -155,14 +196,14 @@ export default function InicioSistemaNeuralVivo() {
             </button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {recentThoughts.map((thought) => (
+            {stats.recent.map((thought) => (
               <EntryCard
                 key={thought.id}
                 text={thought.text}
                 time={thought.time}
                 intensity={thought.intensity}
                 nodeColor={thought.nodeColor}
-                date={thought.date === 'Hoy' ? thought.time : thought.date}
+                date={thought.date || 'Hoy'}
               />
             ))}
           </div>

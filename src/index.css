@@ -271,6 +271,22 @@ input, textarea, select, button { font-family: var(--font-family); }
   border-color: rgba(137, 212, 205, 0.2);
   color: var(--primary);
 }
+.chip.suggested {
+  border-color: rgba(137, 212, 205, 0.6);
+  background: rgba(137, 212, 205, 0.08);
+  animation: pulse-suggested 1.5s ease-in-out infinite;
+}
+@keyframes pulse-suggested {
+  0%, 100% { 
+    border-color: rgba(137, 212, 205, 0.3); 
+    box-shadow: 0 0 0px rgba(137, 212, 205, 0);
+  }
+  50% { 
+    border-color: rgba(255, 255, 255, 0.8); 
+    box-shadow: 0 0 15px rgba(137, 212, 205, 0.4);
+    background: rgba(137, 212, 205, 0.15);
+  }
+}
 .chip-dot {
   width: 6px;
   height: 6px;
