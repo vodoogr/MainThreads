@@ -6,19 +6,19 @@ import { useNeuralStore } from '../store/neuralStore';
 
 // ── Keyword Suggestions ─────────────────────────────────────────────────────
 const CIRCUIT_KEYWORDS = {
-  BIO_SURVIVAL: ['hambre', 'comida', 'salud', 'dinero', 'casa', 'seguridad', 'miedo', 'peligro', 'cuerpo', 'instinto', 'sobrevivir', 'médico', 'alquiler', 'factura', 'dormir', 'insomnio', 'dolor', 'frío', 'calor', 'amenaza'],
-  EMOTIONAL: ['enfado', 'rabia', 'poder', 'estatus', 'orgullo', 'pelea', 'dominancia', 'familia', 'equipo', 'territorio', 'liderazgo', 'celos', 'llorar', 'triste', 'emoción', 'mamá', 'papá', 'hermano', 'jefe', 'discusión'],
-  SYMBOLIC: ['lógica', 'plan', 'duda', 'entender', 'idea', 'aprender', 'datos', 'cálculo', 'explicar', 'racional', 'números', 'análisis', 'preocupación', 'sobrecarga', 'estrés', 'trabajo', 'estudiar', 'pensar', 'mente', 'confusión'],
-  SOCIO_SEXUAL: ['amor', 'pareja', 'sexo', 'atracción', 'moral', 'pecado', 'valor', 'amigo', 'vínculo', 'sociedad', 'ética', 'cita', 'conocer', 'soledad', 'cariño', 'novio', 'novia', 'beso', 'social', 'humano'],
-  NEUROSOMATIC: ['placer', 'música', 'arte', 'baile', 'relax', 'masaje', 'yoga', 'respiración', 'éxtasis', 'cuerpo', 'sensación', 'disfrutar', 'comodidad', 'belleza', 'sol', 'naturaleza', 'bienestar'],
-  METAPROGRAMMING: ['cambio', 'hábito', 'creencia', 'reprogramar', 'identidad', 'voluntad', 'ego', 'espejo', 'conciencia', 'decidido', 'transformar', 'evolucionar', 'creer', 'yo', 'mindset'],
-  NEUROGENETIC: ['legado', 'evolución', 'ancestro', 'especie', 'alma', 'patrón', 'historia', 'vida', 'muerte', 'propósito', 'ancestral', 'futuro', 'humanidad', 'genético', 'raíces'],
-  QUANTUM: ['unidad', 'vacío', 'infinito', 'luz', 'trascender', 'silencio', 'conexión', 'nada', 'todo', 'universo', 'paz', 'cuántico', 'meditación', 'cosmos', 'energía', 'vibración']
+  BIO_SURVIVAL: ['hambre', 'comida', 'salud', 'dinero', 'casa', 'seguridad', 'miedo', 'peligro', 'cuerpo', 'instinto', 'sobrevivir', 'médico', 'alquiler', 'factura', 'dormir', 'insomnio', 'dolor', 'frío', 'calor', 'amenaza', 'vivienda', 'comer', 'supervivencia', 'alimento', 'refugio', 'gastos', 'salario', 'sueldo', 'pobreza'],
+  EMOTIONAL: ['enfado', 'rabia', 'poder', 'estatus', 'orgullo', 'pelea', 'dominancia', 'familia', 'equipo', 'territorio', 'liderazgo', 'celos', 'llorar', 'triste', 'emoción', 'mamá', 'papá', 'hermano', 'jefe', 'discusión', 'jerarquía', 'rival', 'competencia', 'ego', 'autoridad', 'mandar', 'territorial', 'venganza'],
+  SYMBOLIC: ['lógica', 'plan', 'duda', 'entender', 'idea', 'aprender', 'datos', 'cálculo', 'explicar', 'racional', 'números', 'análisis', 'preocupación', 'sobrecarga', 'estrés', 'trabajo', 'estudiar', 'pensar', 'mente', 'confusión', 'teoría', 'sistema', 'computadora', 'ordenador', 'programar', 'cifras', 'lectura', 'libro', 'clase'],
+  SOCIO_SEXUAL: ['amor', 'pareja', 'sexo', 'atracción', 'moral', 'pecado', 'valor', 'amigo', 'vínculo', 'sociedad', 'ética', 'cita', 'conocer', 'soledad', 'cariño', 'novio', 'novia', 'beso', 'social', 'humano', 'matrimonio', 'cultura', 'tabú', 'norma', 'grupo', 'comunidad', 'intimidad'],
+  NEUROSOMATIC: ['placer', 'música', 'arte', 'baile', 'relax', 'masaje', 'yoga', 'respiración', 'éxtasis', 'cuerpo', 'sensación', 'disfrutar', 'comodidad', 'belleza', 'sol', 'naturaleza', 'bienestar', 'paz', 'calma', 'serenidad', 'hedonismo', 'sensorial', 'tacto', 'olor', 'sabor', 'vibrar'],
+  METAPROGRAMMING: ['cambio', 'hábito', 'creencia', 'reprogramar', 'identidad', 'voluntad', 'ego', 'espejo', 'conciencia', 'decidido', 'transformar', 'evolucionar', 'creer', 'yo', 'mindset', 'estrategia', 'autodefinición', 'metáfora', 'sueño', 'lucidez', 'despertar'],
+  NEUROGENETIC: ['legado', 'evolución', 'ancestro', 'especie', 'alma', 'patrón', 'historia', 'vida', 'muerte', 'propósito', 'ancestral', 'futuro', 'humanidad', 'genético', 'raíces', 'mitología', 'arquetipo', 'inconsciente', 'colectivo', 'pasado', 'linaje', 'sangre'],
+  QUANTUM: ['unidad', 'vacío', 'infinito', 'luz', 'trascender', 'silencio', 'conexión', 'nada', 'todo', 'universo', 'paz', 'cuántico', 'meditación', 'cosmos', 'energía', 'vibración', 'átomo', 'misterio', 'divino', 'espiritual', 'no-dualidad', 'presencia', 'eterno']
 };
 
 export default function NuevaEntrada() {
   const navigate = useNavigate();
-  const { circuits, fetchCircuits, addEntry } = useNeuralStore();
+  const { circuits, fetchCircuits, addEntry, currentHrv } = useNeuralStore();
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [intensity, setIntensity] = useState(5);
@@ -29,15 +29,24 @@ export default function NuevaEntrada() {
     if (circuits.length === 0) fetchCircuits();
   }, []);
 
-  // Update suggestions as user types
+  // Update suggestions (Ultra-Fuzzy Logic)
   useEffect(() => {
-    const text = (title + ' ' + body).toLowerCase();
+    const normalize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const text = normalize(title + ' ' + body);
+    
+    if (text.length < 2) {
+      setSuggestedIds(new Set());
+      return;
+    }
+
     const matches = new Set();
     
     Object.entries(CIRCUIT_KEYWORDS).forEach(([id, keywords]) => {
-      if (keywords.some(kw => text.includes(kw))) {
-        matches.add(id);
-      }
+      const isMatch = keywords.some(kw => {
+        const normKw = normalize(kw);
+        return text.includes(normKw) || normKw.includes(text);
+      });
+      if (isMatch) matches.add(id);
     });
 
     setSuggestedIds(matches);
@@ -46,7 +55,7 @@ export default function NuevaEntrada() {
     if (selectedNodes.length === 0 && matches.size > 0) {
       setSelectedNodes([Array.from(matches)[0]]);
     }
-  }, [title, body]);
+  }, [title, body, selectedNodes.length]);
 
   const toggleNode = (nodeId) => {
     setSelectedNodes((prev) => {
@@ -62,17 +71,12 @@ export default function NuevaEntrada() {
       return;
     }
 
-    // Use the first selected node as the primary circuit
-    const circuitId = selectedNodes[0];
     const fullText = title ? `${title}: ${body}` : body;
     
-    const { error } = await addEntry(circuitId, fullText, intensity);
-    
-    if (error) {
-      alert('Error al guardar: ' + error);
-    } else {
-      navigate('/inicio_sistema_neural_vivo');
-    }
+    // Save ONE entry with ALL selected nodes
+    await addEntry(selectedNodes, fullText, intensity, currentHrv);
+
+    navigate('/inicio_sistema_neural_vivo');
   };
 
   return (
@@ -147,7 +151,7 @@ export default function NuevaEntrada() {
           </div>
 
           {/* Text Area */}
-          <div style={{ flex: 1, marginBottom: '2.5rem' }}>
+          <div style={{ flex: 1, minHeight: '300px', marginBottom: '2.5rem' }}>
             <textarea
               id="entry-body"
               placeholder="Escribe lo que te preocupa hoy..."
@@ -156,12 +160,11 @@ export default function NuevaEntrada() {
               spellCheck={false}
               style={{
                 width: '100%',
-                minHeight: 240,
-                height: '100%',
+                minHeight: '300px',
                 background: 'transparent',
                 border: 'none',
                 outline: 'none',
-                fontSize: '1rem',
+                fontSize: '1.25rem',
                 lineHeight: 1.7,
                 color: 'var(--on-surface)',
                 resize: 'none',

@@ -1,111 +1,133 @@
+import { useMemo } from 'react';
 import ScreenContainer from '../components/ScreenContainer';
-import InsightCard from '../components/InsightCard';
-import { insightData } from '../data/mockData';
+import { useNeuralStore } from '../store/neuralStore';
 
 export default function PerspectivasInsights() {
-  const data = insightData;
+  const { allEntries = [], circuits = [] } = useNeuralStore();
+
+  // ── Cálculos de Inteligencia Cerebral ──────────────────────────────────────
+  const stats = useMemo(() => {
+    if (allEntries.length === 0) return null;
+
+    // 1. Balance Hemisférico (Izquierdo: 1-4, Derecho: 5-8)
+    const leftIds = ['BIO_SURVIVAL', 'EMOTIONAL', 'SYMBOLIC', 'SOCIO_SEXUAL'];
+    const rightIds = ['NEUROSOMATIC', 'METAPROGRAMMING', 'NEUROGENETIC', 'QUANTUM'];
+
+    let leftCount = 0;
+    let rightCount = 0;
+    let totalHrv = 0;
+
+    const nodeStats = {};
+
+    allEntries.forEach(entry => {
+      const nodes = entry.nodos_vinculados || [entry.id_circuito];
+      nodes.forEach(id => {
+        if (leftIds.includes(id)) leftCount++;
+        if (rightIds.includes(id)) rightCount++;
+        
+        if (!nodeStats[id]) nodeStats[id] = { count: 0, hrvSum: 0 };
+        nodeStats[id].count++;
+        nodeStats[id].hrvSum += entry.hrv || 72;
+      });
+      totalHrv += entry.hrv || 72;
+    });
+
+    const avgHrv = Math.round(totalHrv / allEntries.length);
+    const totalNodes = leftCount + rightCount;
+    const leftPct = Math.round((leftCount / totalNodes) * 100);
+    const rightPct = 100 - leftPct;
+
+    // 2. Nodo más estresante (Menor HRV promedio)
+    let stressTrigger = null;
+    let minHrv = 200;
+
+    Object.entries(nodeStats).forEach(([id, s]) => {
+      const avg = s.hrvSum / s.count;
+      if (avg < minHrv) {
+        minHrv = avg;
+        stressTrigger = circuits.find(c => c.id === id)?.nombre || id;
+      }
+    });
+
+    return { leftPct, rightPct, avgHrv, stressTrigger, totalEntries: allEntries.length };
+  }, [allEntries, circuits]);
+
+  if (!stats) {
+    return (
+      <ScreenContainer>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80vh', opacity: 0.5 }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 48, marginBottom: 16 }}>analytics</span>
+          <p>Necesitas registrar más hilos para generar perspectivas...</p>
+        </div>
+      </ScreenContainer>
+    );
+  }
 
   return (
     <ScreenContainer>
       <div className="section-gap" style={{ paddingTop: '2rem' }}>
-        {/* Title */}
-        <section>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--on-surface)' }}>
-            Perspectivas
-          </h1>
-          <p style={{ color: 'var(--on-surface-variant)', lineHeight: 1.6, maxWidth: '36rem', marginTop: 8 }}>
-            Tus hilos de pensamiento condensados en sabiduría accionable.
+        <header>
+          <h1 style={{ fontSize: '2rem', fontWeight: 300, color: 'var(--on-surface)' }}>Perspectivas <span style={{ color: 'var(--primary)', fontWeight: 600 }}>Cerebrales</span></h1>
+          <p style={{ color: 'var(--on-surface-variant)', marginTop: 8 }}>Análisis de coherencia entre tus pensamientos y tu biología.</p>
+        </header>
+
+        {/* Hemisphere Balance Card */}
+        <section className="card-high" style={{ padding: '2rem', borderRadius: 'var(--radius-3xl)', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: -50, right: -50, width: 200, height: 200, background: 'var(--primary)', opacity: 0.05, filter: 'blur(60px)', borderRadius: '50%' }} />
+          <h3 className="label-xs" style={{ color: 'var(--primary)', marginBottom: '1.5rem' }}>Equilibrio Hemisférico</h3>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+            <div style={{ flex: stats.leftPct, height: 12, background: 'var(--primary)', borderRadius: '6px 0 0 6px', transition: 'all 1s ease' }} />
+            <div style={{ flex: stats.rightPct, height: 12, background: 'var(--secondary)', borderRadius: '0 6px 6px 0', transition: 'all 1s ease' }} />
+          </div>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--primary)' }}>{stats.leftPct}%</div>
+              <div className="label-xxs">Izquierdo (Lógico)</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--secondary)', textAlign: 'right' }}>{stats.rightPct}%</div>
+              <div className="label-xxs" style={{ textAlign: 'right' }}>Derecho (Intuitivo)</div>
+            </div>
+          </div>
+        </section>
+
+        {/* Biometric Intensity Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div className="card" style={{ padding: '1.5rem' }}>
+            <span className="material-symbols-outlined" style={{ color: '#fa746f' }}>favorite</span>
+            <div style={{ fontSize: '1.75rem', fontWeight: 300, marginTop: 12 }}>{stats.avgHrv}ms</div>
+            <div className="label-xxs" style={{ opacity: 0.6 }}>HRV Promedio</div>
+          </div>
+          <div className="card" style={{ padding: '1.5rem' }}>
+            <span className="material-symbols-outlined" style={{ color: 'var(--tertiary)' }}>bolt</span>
+            <div style={{ fontSize: '1.25rem', fontWeight: 600, marginTop: 12, color: 'var(--on-surface)' }}>{stats.stressTrigger}</div>
+            <div className="label-xxs" style={{ opacity: 0.6 }}>Disparador de Estrés</div>
+          </div>
+        </div>
+
+        {/* Insight AI Text */}
+        <section className="card-low" style={{ padding: '2rem', borderLeft: '4px solid var(--primary)' }}>
+          <h4 style={{ fontWeight: 600, marginBottom: 12 }}>Diagnóstico del Estado de Conciencia</h4>
+          <p style={{ color: 'var(--on-surface-variant)', lineHeight: 1.7, fontSize: '0.94rem' }}>
+            Basado en tus <span style={{ color: 'var(--primary)' }}>{stats.totalEntries}</span> hilos recientes, tu mente muestra un predominio 
+            del {stats.leftPct > 60 ? 'procesamiento lineal y analítico' : stats.rightPct > 60 ? 'procesamiento creativo y holístico' : 'equilibrio funcional'}. 
+            Tu mayor desafío biológico ocurre al interactuar con el nodo <span style={{ color: '#fa746f' }}>{stats.stressTrigger}</span>, donde tu variabilidad cardíaca desciende.
           </p>
         </section>
 
-        {/* Weekly Insight */}
-        <InsightCard style={{ position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: -96, right: -96, width: 256, height: 256, background: 'rgba(137,212,205,0.1)', filter: 'blur(100px)', borderRadius: '50%', pointerEvents: 'none' }} />
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: '1.5rem' }}>
-              <span className="label-xs" style={{ background: 'rgba(137,212,205,0.2)', color: 'var(--primary)', padding: '4px 12px', borderRadius: 'var(--radius-full)' }}>Semanal</span>
-              <span style={{ color: 'var(--on-surface-variant)', fontSize: '0.875rem', fontWeight: 500 }}>{data.weekly.period}</span>
-            </div>
-            <h2 style={{ fontSize: '1.375rem', fontWeight: 600, color: 'var(--on-surface)', marginBottom: '1rem', lineHeight: 1.3 }}>{data.weekly.title}</h2>
-            <p style={{ fontSize: '1.0625rem', color: 'var(--on-surface-variant)', fontWeight: 300, lineHeight: 1.7, fontStyle: 'italic', marginBottom: '2rem' }}>
-              &ldquo;Esta semana has activado principalmente áreas relacionadas con <span style={{ color: 'var(--primary)', fontWeight: 500 }}>seguridad</span> y <span style={{ color: 'var(--secondary)', fontWeight: 500 }}>presión interna</span>.&rdquo;
-            </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ display: 'flex' }}>
-                <div style={{ width: 40, height: 40, borderRadius: '50%', border: '2px solid var(--bg)', background: 'var(--primary-container)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 16, color: 'var(--on-primary-container)' }}>psychology</span>
-                </div>
-                <div style={{ width: 40, height: 40, borderRadius: '50%', border: '2px solid var(--bg)', background: 'var(--secondary-container)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: -8 }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#cbb5f4' }}>shield</span>
-                </div>
-              </div>
-              <span style={{ fontSize: '0.875rem', color: 'var(--on-surface-variant)' }}>Conexiones detectadas entre {data.weekly.connectionsDetected} nodos.</span>
-            </div>
+        {/* Suggestions Card */}
+        <section className="card" style={{ padding: '1.5rem', background: 'rgba(137,212,205,0.05)', border: '1px dashed rgba(137,212,205,0.3)' }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <span className="material-symbols-outlined" style={{ color: 'var(--primary)' }}>auto_awesome</span>
+            <span className="label-xs" style={{ color: 'var(--primary)' }}>MISIÓN SUGERIDA</span>
           </div>
-        </InsightCard>
-
-        {/* Thread Health */}
-        <div className="card" style={{ padding: '1.5rem' }}>
-          <h3 className="label-xs" style={{ color: 'var(--on-surface-variant)', marginBottom: '1rem' }}>Estado de Hebras</h3>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, height: 96, marginBottom: '1rem' }}>
-            {data.threadHealth.bars.map((h, i) => (
-              <div key={i} className="trend-bar" style={{ height: `${h}%`, background: h > 80 ? 'var(--primary)' : h > 50 ? 'rgba(137,212,205,0.4)' : 'rgba(137,212,205,0.1)', boxShadow: h > 80 ? '0 0 15px rgba(137,212,205,0.2)' : 'none' }} />
-            ))}
-          </div>
-          <p style={{ fontSize: '0.75rem', color: 'var(--on-surface-variant)', lineHeight: 1.6 }}>
-            Tus niveles de claridad han aumentado un <span style={{ color: 'var(--primary)' }}>{data.threadHealth.clarityIncrease}%</span> respecto al mes pasado.
+          <p style={{ marginTop: 12, fontSize: '0.9rem', color: 'var(--on-surface-variant)' }}>
+            Observamos una saturación en circuitos de supervivencia. Te sugerimos 10 minutos de <b>Respiración Box</b> para elevar tu HRV antes de tu próxima entrada.
           </p>
-        </div>
-
-        {/* Recurring Pattern */}
-        <div className="card" style={{ padding: '1.5rem', background: 'var(--surface-container-high)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-            <span className="material-symbols-outlined" style={{ color: 'var(--tertiary)' }}>auto_awesome</span>
-            <span className="label-xs" style={{ color: 'var(--tertiary)', background: 'rgba(255,234,175,0.2)', padding: '2px 8px', borderRadius: 4 }}>PATRÓN</span>
-          </div>
-          <h4 style={{ fontWeight: 600, color: 'var(--on-surface)', marginBottom: 8 }}>{data.recurringPattern.title}</h4>
-          <p style={{ fontSize: '0.875rem', color: 'var(--on-surface-variant)', lineHeight: 1.6 }}>
-            Existe una conexión recurrente entre el <span style={{ color: 'var(--tertiary)' }}>pensamiento excesivo</span> y sensaciones corporales reportadas.
-          </p>
-        </div>
-
-        {/* Monthly Summary */}
-        <div className="card-low" style={{ padding: '2rem', borderRadius: 'var(--radius-3xl)', border: '1px solid rgba(72,72,72,0.15)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
-          <div style={{ position: 'relative', width: 128, height: 128, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ position: 'absolute', inset: 0, border: '4px solid rgba(72,72,72,0.2)', borderRadius: '50%' }} />
-            <div style={{ position: 'absolute', inset: 0, border: '4px solid var(--secondary)', borderTop: '4px solid transparent', borderLeft: '4px solid transparent', borderRadius: '50%', transform: 'rotate(45deg)' }} />
-            <div style={{ textAlign: 'center' }}>
-              <span style={{ display: 'block', fontSize: '1.5rem', fontWeight: 700, color: 'var(--secondary)' }}>{data.monthly.nodesActivated}</span>
-              <span className="label-xxs" style={{ color: 'var(--on-surface-variant)' }}>Nodos {data.monthly.month}</span>
-            </div>
-          </div>
-          <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--on-surface)', marginBottom: '1rem' }}>Resumen de {data.monthly.month}</h3>
-            <p style={{ fontSize: '0.875rem', color: 'var(--on-surface-variant)', lineHeight: 1.7 }}>{data.monthly.summary}</p>
-            <button style={{ marginTop: '1rem', color: 'var(--secondary)', fontSize: '0.875rem', fontWeight: 500, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-              Ver análisis detallado <span className="material-symbols-outlined" style={{ fontSize: 14 }}>arrow_forward</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Dominant Threads */}
-        <section>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1.5rem' }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--on-surface)' }}>Hebras Dominantes</h2>
-            <span className="label-xs" style={{ color: 'var(--on-surface-variant)' }}>Distribución Mental</span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {data.dominantThreads.map((thread, i) => (
-              <div key={i} className="card" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ width: 8, height: 48, borderRadius: 'var(--radius-full)', background: thread.color, boxShadow: `0 0 10px ${thread.color}66` }} />
-                <div>
-                  <div className="label-xs" style={{ color: 'var(--on-surface-variant)', marginBottom: 4 }}>{thread.category}</div>
-                  <div style={{ fontWeight: 500, color: 'var(--on-surface)' }}>{thread.label}</div>
-                </div>
-              </div>
-            ))}
-          </div>
         </section>
+
       </div>
     </ScreenContainer>
   );

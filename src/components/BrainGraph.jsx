@@ -43,6 +43,9 @@ export default function BrainGraph({ data }) {
   const simRef  = useRef(null);
   const [expandedIds, setExpandedIds]  = useState(new Set());
   const [hoveredNode, setHoveredNode]  = useState(null);
+  const [biometricSync, setBiometricSync] = useState(false);
+  const [hrvValue, setHrvValue] = useState(72); // Mock HRV for now
+  const [focusedNodeId, setFocusedNodeId] = useState(null);
 
   // ── Zustand Store ─────────────────────────────────────────────────────────
   const { 
@@ -57,6 +60,21 @@ export default function BrainGraph({ data }) {
     if (storeCircuits.length === 0) fetchCircuits();
     if (Object.keys(storeEntries).length === 0) fetchEntries();
   }, []);
+
+  const handleExport = async () => {
+    const html2canvas = (await import('html2canvas')).default;
+    const element = svgRef.current.parentElement;
+    const canvas = await html2canvas(element, {
+      backgroundColor: '#000',
+      logging: false,
+      useCORS: true,
+      scale: 2 // High quality
+    });
+    const link = document.createElement('a');
+    link.download = `Mental-Threads-Constellation-${new Date().toISOString().slice(0,10)}.png`;
+    link.href = canvas.toDataURL();
+    link.click();
+  };
 
   // Use store data if available, otherwise fallback to mock/props
   const circuitsToUse = storeCircuits.length > 0 ? storeCircuits : (data?.nodes || fallbackData.nodes);
@@ -93,6 +111,21 @@ export default function BrainGraph({ data }) {
       color:    lP >= 50 ? '#60b8ff' : '#ff6eb4',
     };
   }, [graphData.nodes]);
+
+  // ── Avatar Evolution (Living Visuals) ───────────────────────────────────
+  const avatarVisuals = useMemo(() => {
+    const totalEntries = Object.values(entriesToUse).flat().length;
+    const balanceDrift = Math.abs(balance.left - 50); // 0 = perfectly balanced
+    
+    // Growth effects (more entries = more energy)
+    const brightness = Math.min(0.8 + (totalEntries * 0.04), 1.6);
+    const saturation = Math.min(1.0 + (totalEntries * 0.08), 2.2);
+    // Clarity effects (more balance = less blur)
+    const blur       = Math.max(0, (balanceDrift / 5) - 1); 
+    const opacity    = Math.min(0.12 + (totalEntries * 0.012), 0.35);
+
+    return { brightness, saturation, blur, opacity };
+  }, [entriesToUse, balance]);
 
   // ── Node/Link Graph Construction ──────────────────────────────────────────
   const { nodes, links } = useMemo(() => {
@@ -134,8 +167,23 @@ export default function BrainGraph({ data }) {
     const svg = d3.select(svgRef.current);
     const W = 900, H = 500;
     
+    // Zoom/Focus Logic
+    let transform = d3.zoomIdentity;
+    if (focusedNodeId) {
+      const targetNode = nodes.find(n => n.id === focusedNodeId);
+      if (targetNode) {
+        const scale = 1.8;
+        const tx = W / 2 - targetNode.x * scale;
+        const ty = H / 2 - targetNode.y * scale;
+        transform = d3.zoomIdentity.translate(tx, ty).scale(scale);
+      }
+    }
+
     svg.selectAll('.sim-layer').remove();
-    const root = svg.append('g').attr('class', 'sim-layer');
+    const root = svg.append('g')
+      .attr('class', 'sim-layer')
+      .attr('transform', transform);
+    
     const defs = svg.select('defs');
 
     // Glow
@@ -209,9 +257,15 @@ export default function BrainGraph({ data }) {
     nodeSel.on('click', (event, d) => {
       event.stopPropagation();
       if (d._type === 'circuit') {
+        const isCurrentlyFocused = focusedNodeId === d.id;
+        setFocusedNodeId(isCurrentlyFocused ? null : d.id);
         setExpandedIds(prev => {
           const next = new Set(prev);
-          next.has(d.id) ? next.delete(d.id) : next.add(d.id);
+          if (isCurrentlyFocused) {
+            next.delete(d.id);
+          } else {
+            next.add(d.id);
+          }
           return next;
         });
       } else if (d.parentId) navigate(`/detalle_de_nodo/${d.parentId}`);
@@ -256,12 +310,16 @@ export default function BrainGraph({ data }) {
         </div>
       )}
       
-      {/* Background Brain (Holographic Side View - Color) */}
+      {/* Background Brain (Living Evolution) */}
       <img 
         src="/assets/brain_bg.png" 
         style={{ 
           position: 'absolute', inset: 0, width: '100%', height: '100%', 
-          objectFit: 'cover', opacity: 0.18, pointerEvents: 'none' 
+          objectFit: 'cover', 
+          opacity: avatarVisuals.opacity, 
+          filter: `brightness(${avatarVisuals.brightness}) saturate(${avatarVisuals.saturation}) blur(${avatarVisuals.blur}px)`,
+          pointerEvents: 'none',
+          transition: 'all 2.5s cubic-bezier(0.4, 0, 0.2, 1)' 
         }} 
       />
 
@@ -273,6 +331,50 @@ export default function BrainGraph({ data }) {
       <svg ref={svgRef} viewBox="0 0 900 500" style={{ width: '100%', height: '100%', position: 'relative', zIndex: 2 }}>
         <defs />
       </svg>
+
+      {/* Control Tools */}
+      <div style={{ position: 'absolute', bottom: '1.5rem', right: '1.5rem', display: 'flex', gap: '0.75rem', zIndex: 30 }}>
+        <button 
+          onClick={handleExport}
+          className="glass-card" 
+          style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.1)' }}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: '1.2rem' }}>download</span>
+        </button>
+        <button 
+          onClick={() => setBiometricSync(!biometricSync)}
+          className="glass-card" 
+          style={{ 
+            width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', 
+            color: biometricSync ? '#00ffcc' : 'white', cursor: 'pointer', border: biometricSync ? '1px solid #00ffcc' : '1px solid rgba(255,255,255,0.1)' 
+          }}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: '1.2rem' }}>watch</span>
+        </button>
+      </div>
+
+      {/* Huawei Biometric Overlay */}
+      {biometricSync && (
+        <div style={{ position: 'absolute', top: '7rem', left: '2rem', zIndex: 25 }} className="animate-fade-in">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(0,0,0,0.6)', padding: '0.5rem 1rem', borderRadius: '1rem', border: '1px solid #00ffcc55', backdropFilter: 'blur(10px)' }}>
+            <div className="animate-pulse-slow" style={{ width: 8, height: 8, borderRadius: '50%', background: '#00ffcc' }} />
+            <span className="label-xs" style={{ color: '#00ffcc', letterSpacing: '0.1em' }}>GT5 Sync: {hrvValue} ms (Estrés Bajo)</span>
+          </div>
+        </div>
+      )}
+
+      {focusedNodeId && (
+        <button 
+          onClick={(e) => { e.stopPropagation(); setFocusedNodeId(null); setExpandedIds(new Set()); }}
+          style={{ position: 'absolute', top: '2rem', left: '50%', transform: 'translateX(-50%)', zIndex: 50, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '0.6rem 1.25rem', borderRadius: '99px', cursor: 'pointer', backdropFilter: 'blur(10px)' }}
+          className="label-xs animate-fade-in"
+        >
+          <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>close</span>
+            Vista Global
+          </span>
+        </button>
+      )}
 
       {/* Analytics Overlay (Restored) */}
       <div style={{ position: 'absolute', top: '2rem', left: '2rem', right: '2rem', pointerEvents: 'none', zIndex: 10, display: 'flex', justifyContent: 'space-between' }}>

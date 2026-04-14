@@ -8,7 +8,7 @@ import BrainGraph from '../components/BrainGraph';
 
 export default function InicioSistemaNeuralVivo() {
   const navigate = useNavigate();
-  const { circuits, entries, loading, fetchCircuits, fetchEntries } = useNeuralStore();
+  const { circuits, entries, loading, fetchCircuits, fetchEntries, syncWatch, connectedWatch, currentHrv } = useNeuralStore();
 
   useEffect(() => {
     fetchCircuits();
@@ -51,6 +51,55 @@ export default function InicioSistemaNeuralVivo() {
 
   return (
     <ScreenContainer>
+      {/* Huawei Watch Sync Indicator */}
+      <div 
+        onClick={syncWatch}
+        className="card-low"
+        style={{
+          position: 'fixed',
+          top: '1.5rem',
+          right: '1.5rem',
+          padding: '0.75rem 1rem',
+          borderRadius: 'var(--radius-full)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          cursor: 'pointer',
+          border: connectedWatch ? '1px solid var(--primary)' : '1px solid rgba(255,255,255,0.1)',
+          background: 'rgba(23,23,23,0.6)',
+          backdropFilter: 'blur(10px)',
+          zIndex: 1000,
+          transition: 'all 0.3s ease'
+        }}
+      >
+        <div style={{ position: 'relative' }}>
+          <span className="material-symbols-outlined" style={{ 
+            color: connectedWatch ? 'var(--primary)' : 'var(--on-surface-variant)',
+            fontSize: 20
+          }}>
+            watch
+          </span>
+          {connectedWatch && (
+            <div style={{ 
+              position: 'absolute', top: -2, right: -2, width: 8, height: 8, 
+              background: 'var(--primary)', borderRadius: '50%',
+              boxShadow: '0 0 10px var(--primary)'
+            }} />
+          )}
+        </div>
+        
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <span className="label-xxs" style={{ color: connectedWatch ? 'var(--primary)' : 'var(--outline)', letterSpacing: '0.05em' }}>
+            {connectedWatch ? 'GT5 CONECTADO' : 'SINCRONIZAR RELOJ'}
+          </span>
+          {connectedWatch && (
+            <span style={{ fontSize: '0.65rem', color: 'var(--on-surface-variant)', fontWeight: 300 }}>
+              HRV: {currentHrv}ms | Bat: {connectedWatch.battery}
+            </span>
+          )}
+        </div>
+      </div>
+
       <div className="section-gap" style={{ paddingTop: '2rem' }}>
         {/* Brain Graph Area */}
         <BrainGraph />
