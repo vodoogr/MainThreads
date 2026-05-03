@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 
 export default function AppHeader({ subtitle }) {
+  const { user, signOut, loading } = useAuthStore();
+  const emailLabel = user?.email ? user.email.split('@')[0] : 'perfil';
+
   return (
     <header
       id="app-header"
@@ -55,6 +59,18 @@ export default function AppHeader({ subtitle }) {
           >
             Mental Threads
           </Link>
+          <span
+            style={{
+              fontSize: '0.75rem',
+              color: 'var(--outline)',
+              maxWidth: 120,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {emailLabel}
+          </span>
           {subtitle && (
             <span
               style={{
@@ -89,17 +105,19 @@ export default function AppHeader({ subtitle }) {
             style={{
               color: 'var(--primary)',
               background: 'transparent',
-              border: 'none',
+              border: '1px solid rgba(137,212,205,0.2)',
               cursor: 'pointer',
-              padding: 8,
-              borderRadius: '50%',
+              padding: '0.5rem 0.9rem',
+              borderRadius: '999px',
               display: 'flex',
-              transition: 'background 0.2s',
+              alignItems: 'center',
+              gap: 8,
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--surface-container-high)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+            onClick={() => signOut()}
+            disabled={loading}
           >
-            <span className="material-symbols-outlined">calendar_today</span>
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>logout</span>
+            <span className="label-xs" style={{ letterSpacing: '0.08em' }}>Salir</span>
           </button>
         </div>
       </div>

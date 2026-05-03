@@ -11,6 +11,18 @@ export const useNeuralStore = create((set, get) => ({
   currentHrv: 75, // Biometric state from Watch
   connectedWatch: null, // { device, status, lastSync, battery }
 
+  clearData: () => {
+    set({
+      circuits: [],
+      entries: {},
+      allEntries: [],
+      loading: false,
+      error: null,
+      currentHrv: 75,
+      connectedWatch: null,
+    });
+  },
+
   // Fetch all circuits
   fetchCircuits: async () => {
     set({ loading: true });
@@ -31,9 +43,18 @@ export const useNeuralStore = create((set, get) => ({
   // Fetch all entries (hilos)
   fetchEntries: async () => {
     set({ loading: true });
+    const { data: authData } = await supabase.auth.getUser();
+    const user = authData.user;
+
+    if (!user) {
+      set({ entries: {}, allEntries: [], loading: false });
+      return;
+    }
+
     const { data, error } = await supabase
       .from('entradas')
       .select('*')
+      .eq('user_id', user.id)
       .order('creado_en', { ascending: false });
 
     if (error) {
@@ -66,6 +87,14 @@ export const useNeuralStore = create((set, get) => ({
   // Add a single thought connected to multiple nodes
   addEntry: async (circuitIds, text, intensity = 5, hrv = 72) => {
     set({ loading: true });
+    const { data: authData } = await supabase.auth.getUser();
+    const user = authData.user;
+
+    if (!user) {
+      set({ loading: false, error: 'Debes iniciar sesion para guardar entradas.' });
+      return { data: null, error: { message: 'Debes iniciar sesion para guardar entradas.' } };
+    }
+
     // Normalize circuitIds to array if it's a single string
     const nodeArray = Array.isArray(circuitIds) ? circuitIds : [circuitIds];
     
@@ -73,6 +102,7 @@ export const useNeuralStore = create((set, get) => ({
       .from('entradas')
       .insert([
         { 
+          user_id: user.id,
           id_circuito: nodeArray[0], // Keep primary for backward compatibility
           nodos_vinculados: nodeArray, 
           texto: text, 
@@ -90,10 +120,19 @@ export const useNeuralStore = create((set, get) => ({
   // Update an entry
   updateEntry: async (entryId, updates) => {
     set({ loading: true });
+    const { data: authData } = await supabase.auth.getUser();
+    const user = authData.user;
+
+    if (!user) {
+      set({ loading: false, error: 'Sesion no valida.' });
+      return { error: { message: 'Sesion no valida.' } };
+    }
+
     const { error } = await supabase
       .from('entradas')
       .update(updates)
-      .eq('id', entryId);
+      .eq('id', entryId)
+      .eq('user_id', user.id);
 
     if (!error) await get().fetchEntries();
     set({ loading: false });
@@ -102,6 +141,13 @@ export const useNeuralStore = create((set, get) => ({
 
   // Delete an entry (Optimistic)
   deleteEntry: async (entryId) => {
+    const { data: authData } = await supabase.auth.getUser();
+    const user = authData.user;
+
+    if (!user) {
+      return { error: 'Sesion no valida.' };
+    }
+
     // 1. Optimistic Update: Remove from local state immediately
     const previousEntries = get().allEntries;
     const previousGrouped = get().entries;
@@ -120,7 +166,8 @@ export const useNeuralStore = create((set, get) => ({
     const { error } = await supabase
       .from('entradas')
       .delete()
-      .eq('id', entryId);
+      .eq('id', entryId)
+      .eq('user_id', user.id);
 
     if (error) {
       console.error('Error al borrar en Supabase:', error.message);

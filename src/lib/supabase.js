@@ -4,9 +4,15 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('CRITICAL: Supabase URL or Anon Key missing in .env file. Real-time sync will fail.');
+  console.error('CRITICAL: Supabase URL or Anon Key missing in environment variables. Real-time sync will fail.');
 } else {
   console.log('Supabase Initialized: Connecting to', supabaseUrl);
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+  },
+});
