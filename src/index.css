@@ -77,6 +77,8 @@ body {
 
 #root { min-height: 100dvh; display: flex; flex-direction: column; }
 
+html, body, #root { width: 100%; }
+
 ::selection { background: rgba(137, 212, 205, 0.3); }
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -186,7 +188,7 @@ input, textarea, select, button { font-family: var(--font-family); }
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 0.75rem 1rem 1.5rem;
+  padding: 0.75rem 1rem calc(1rem + env(safe-area-inset-bottom));
   background: rgba(25, 26, 26, 0.8);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -228,7 +230,7 @@ input, textarea, select, button { font-family: var(--font-family); }
 /* ── FAB ─────────────────────────────────────────────────── */
 .fab {
   position: fixed;
-  bottom: 7rem;
+  bottom: calc(6.5rem + env(safe-area-inset-bottom));
   right: 1.5rem;
   z-index: 55;
   display: flex;
@@ -361,7 +363,7 @@ input, textarea, select, button { font-family: var(--font-family); }
   max-width: 48rem; /* 768px */
   margin: 0 auto;
   padding: 0 1.5rem;
-  padding-bottom: 8rem;
+  padding-bottom: calc(8rem + env(safe-area-inset-bottom));
   width: 100%;
 }
 
@@ -383,4 +385,30 @@ input, textarea, select, button { font-family: var(--font-family); }
 /* ── Responsive helpers ──────────────────────────────────── */
 @media (min-width: 768px) {
   .screen-container { max-width: 64rem; }
+}
+
+@media (max-width: 640px) {
+  html { font-size: 15px; }
+
+  .screen-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .bottom-nav a,
+  .bottom-nav button {
+    min-width: 0;
+    padding: 0.5rem 0.625rem;
+    flex: 1;
+  }
+
+  .bottom-nav .nav-label { font-size: 0.5625rem; }
+
+  .fab {
+    left: 1rem;
+    right: 1rem;
+    justify-content: center;
+  }
+
+  .neural-card { border-radius: 1.5rem; }
 }

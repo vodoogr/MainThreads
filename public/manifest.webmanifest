@@ -1,0 +1,25 @@
+{
+  "name": "Mental Threads",
+  "short_name": "Threads",
+  "description": "Mapa consciente de pensamiento para registrar hilos mentales, explorar patrones y revisar insights biometrico-emocionales.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0e0e0e",
+  "theme_color": "#0e0e0e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/holographic_3d_brain_neural_network_1776032017663.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/holographic_3d_brain_neural_network_1776032017663.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
